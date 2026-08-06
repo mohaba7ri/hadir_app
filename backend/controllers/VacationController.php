@@ -120,11 +120,31 @@ class VacationController
                             $limitEmp = $limitStmt->fetch(PDO::FETCH_ASSOC);
                             $monthlyLimit = $limitEmp ? (int)($limitEmp['monthly_annual_leave_limit_minutes'] ?? 750) : 750;
 
-                            $month = date('m', strtotime($start_date));
-                            $year = date('Y', strtotime($start_date));
+                            $dt = new DateTime($start_date);
+                            $day = (int) $dt->format('d');
+                            $month = (int) $dt->format('m');
+                            $year = (int) $dt->format('Y');
+
+                            if ($day >= 25) {
+                                $month++;
+                                if ($month > 12) {
+                                    $month = 1;
+                                    $year++;
+                                }
+                            }
+
+                            if ($month == 1) {
+                                $start_month = 12;
+                                $start_year = $year - 1;
+                            } else {
+                                $start_month = $month - 1;
+                                $start_year = $year;
+                            }
+                            $cycle_start = sprintf('%04d-%02d-25', $start_year, $start_month);
+                            $cycle_end = sprintf('%04d-%02d-24', $year, $month);
                             
-                            $sumStmt = $this->db->prepare("SELECT SUM(total_minutes) as used_minutes FROM atk_vacations WHERE employee_id = ? AND vacation_type = 'إجازة سنوية' AND MONTH(start_date) = ? AND YEAR(start_date) = ? AND status != 'rejected'");
-                            $sumStmt->execute([$employee_id, $month, $year]);
+                            $sumStmt = $this->db->prepare("SELECT SUM(total_minutes) as used_minutes FROM atk_vacations WHERE employee_id = ? AND vacation_type = 'إجازة سنوية' AND start_date >= ? AND start_date <= ? AND status != 'rejected'");
+                            $sumStmt->execute([$employee_id, $cycle_start, $cycle_end]);
                             $sumRow = $sumStmt->fetch(PDO::FETCH_ASSOC);
                             $usedMinutes = $sumRow ? (int)($sumRow['used_minutes'] ?? 0) : 0;
                             
