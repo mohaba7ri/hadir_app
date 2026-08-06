@@ -1,0 +1,24 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Redirect all requests to index.html if the requested file/directory does not exist
+  # This is crucial for Flutter Web routing (PathUrlStrategy) to work correctly without the # hash
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^.*$ index.html [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Disable caching for index.html, json, and JavaScript files to ensure the latest version is always fetched
+  <FilesMatch "\.(html|htm|js|json)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires 0
+  </FilesMatch>
+
+  # Cache assets like images and fonts for better performance
+  <FilesMatch "\.(jpg|jpeg|png|gif|svg|ico|woff|woff2|ttf|eot|css)$">
+    Header set Cache-Control "max-age=31536000, public"
+  </FilesMatch>
+</IfModule>

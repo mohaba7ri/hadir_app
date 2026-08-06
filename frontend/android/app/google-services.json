@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "870519253162",
+    "project_id": "hadir-app-d5cfb",
+    "storage_bucket": "hadir-app-d5cfb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:870519253162:android:ebcd2193bb387d310308d3",
+        "android_client_info": {
+          "package_name": "com.example.attendace"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBn--fpRxlsyc3zd4VtvZFZI-XrY-Irkpw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
