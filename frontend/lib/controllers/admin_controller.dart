@@ -593,6 +593,27 @@ class AdminController extends GetxController {
     }
   }
 
+  Future<String?> deleteVacation(int id) async {
+    isLoading.value = true;
+    try {
+      final res = await _api.deleteVacation(id);
+      if (res != null && res is Map) {
+        if (res['status'] == 'error') {
+          return res['message']?.toString() ?? 'تعذر حذف الإجازة';
+        }
+        fetchVacationRequests();
+        fetchEmployees();
+        fetchAttendance();
+        return null; // Success
+      }
+      return 'فشل الاتصال بالخادم';
+    } catch (e) {
+      return 'حدث خطأ: $e';
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   Future<List<Map<String, dynamic>>> fetchDetailedAttendance(
       int employeeId, String startDate, String endDate) async {
     try {

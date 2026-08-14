@@ -103,6 +103,22 @@ class ApiService extends GetConnect {
     }
   }
 
+  Future<dynamic> deleteVacation(int id) async {
+    final response = await delete('/vacations/$id');
+    if (response.status.hasError) {
+      if (response.bodyString != null && response.bodyString!.isNotEmpty) {
+        try {
+          final decoded = jsonDecode(response.bodyString!);
+          if (decoded is Map && decoded.containsKey('message')) {
+            return {"status": "error", "message": decoded['message']};
+          }
+        } catch (_) {}
+      }
+      return {"status": "error", "message": response.statusText};
+    }
+    return jsonDecode(response.bodyString ?? '{}');
+  }
+
   Future<dynamic> uploadJson(String endpoint, String filePath) async {
     final formData = FormData({
       'file': MultipartFile(filePath, filename: 'attendance.json'),

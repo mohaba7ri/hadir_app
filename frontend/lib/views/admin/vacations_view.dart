@@ -260,8 +260,9 @@ class _VacationsViewState extends State<VacationsView>
                           ),
                           trailing: Obx(() {
                             final isLoading = controller.isLoading.value;
+                            Widget statusWidget;
                             if (req.status == 'pending') {
-                              return Row(
+                              statusWidget = Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   if (Responsive.isMobile(context)) ...[
@@ -324,23 +325,52 @@ class _VacationsViewState extends State<VacationsView>
                                   ],
                                 ],
                               );
-                            }
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: _getStatusColor(req.status)
-                                    .withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                req.status == 'approved' ? 'مقبولة' : 'مرفوضة',
-                                style: TextStyle(
-                                  color: _getStatusColor(req.status),
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
+                            } else {
+                              statusWidget = Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: _getStatusColor(req.status)
+                                      .withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                              ),
+                                child: Text(
+                                  req.status == 'approved' ? 'مقبولة' : 'مرفوضة',
+                                  style: TextStyle(
+                                    color: _getStatusColor(req.status),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              );
+                            }
+                            
+                            return Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                statusWidget,
+                                SizedBox(width: 8),
+                                IconButton(
+                                  onPressed: () {
+                                    UiUtils.showConfirmDialog(
+                                      title: 'تأكيد الحذف',
+                                      message: 'هل أنت متأكد من حذف هذه الإجازة؟',
+                                      confirmColor: AppTheme.errorRed,
+                                      confirmText: 'حذف',
+                                      onConfirm: () async {
+                                        final res = await controller.deleteVacation(req.id!);
+                                        if (res == null) {
+                                          UiUtils.showSuccessDialog('تم الحذف', 'تم حذف الإجازة بنجاح.');
+                                        } else {
+                                          UiUtils.showErrorDialog('تعذر الحذف', res);
+                                        }
+                                      }
+                                    );
+                                  },
+                                  icon: Icon(Icons.delete_outline_rounded, size: 20, color: AppTheme.errorRed),
+                                  tooltip: 'حذف الإجازة',
+                                ),
+                              ],
                             );
                           }),
                         );

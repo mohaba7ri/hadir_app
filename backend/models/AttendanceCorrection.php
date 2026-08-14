@@ -21,6 +21,16 @@ class AttendanceCorrection
         $this->conn = $db;
     }
 
+    public function isDateClosed($employee_id, $date)
+    {
+        $q = "SELECT id FROM atk_monthly_payrolls WHERE employee_id = :empId AND start_date <= :dt AND end_date >= :dt";
+        $s = $this->conn->prepare($q);
+        $s->bindParam(":empId", $employee_id);
+        $s->bindParam(":dt", $date);
+        $s->execute();
+        return $s->fetch() ? true : false;
+    }
+
     public function create()
     {
         $query = "INSERT INTO " . $this->table_name . "

@@ -57,6 +57,13 @@ class AttendanceCorrectionsController {
                     break;
                 }
 
+                // Prevent if date is in closed month
+                if ($this->correction->isDateClosed($data->employee_id, $data->date)) {
+                    http_response_code(400);
+                    echo json_encode(array("status" => "error", "message" => "لا يمكن إجراء تصحيح بصمات لأن هذا اليوم يقع ضمن شهر تم إغلاقه (الإغلاق الشهري)."));
+                    break;
+                }
+
                 $this->correction->employee_id = $data->employee_id;
                 $this->correction->date = $data->date;
                 $this->correction->type = $data->type;

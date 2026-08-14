@@ -1967,25 +1967,23 @@ class _AttendanceViewState extends State<AttendanceView> {
                       ),
                       SizedBox(height: 8),
                     ],
-                    if (effectiveStatus == 'incomplete') ...[
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            Get.back();
-                            _showAddCorrectionDialog(context, controller, att);
-                          },
-                          icon: Icon(Icons.edit_calendar_rounded, size: 18),
-                          label: const Text('إجراء تصحيح بصمات', style: TextStyle(fontWeight: FontWeight.bold)),
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orange,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              elevation: 0),
-                        ),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Get.back();
+                          _showAddCorrectionDialog(context, controller, att);
+                        },
+                        icon: Icon(Icons.edit_calendar_rounded, size: 18),
+                        label: const Text('إجراء تصحيح بصمات', style: TextStyle(fontWeight: FontWeight.bold)),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            elevation: 0),
                       ),
-                    ],
+                    ),
                   ],
                 ),
               ),

@@ -2548,19 +2548,33 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                       ),
                       SizedBox(height: 8),
                     ],
-                    if (att.checkOut == null || att.checkOut!.isEmpty) ...[
+                    if (hasVacation && vacation != null) ...[
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
                           onPressed: () {
                             Get.back();
-                            _showAddCorrectionDialog(context, controller, att);
+                            UiUtils.showConfirmDialog(
+                              title: 'تأكيد الحذف',
+                              message: 'هل أنت متأكد من حذف هذه الإجازة؟',
+                              confirmColor: AppTheme.errorRed,
+                              confirmText: 'حذف',
+                              onConfirm: () async {
+                                final res = await controller.deleteVacation(vacation.id!);
+                                if (res == null) {
+                                  UiUtils.showSuccessDialog('تم الحذف', 'تم حذف الإجازة بنجاح.');
+                                  controller.fetchEmployeeMonthlySummary(employee.id!);
+                                } else {
+                                  UiUtils.showErrorDialog('تعذر الحذف', res);
+                                }
+                              }
+                            );
                           },
-                          icon: Icon(Icons.edit_calendar_rounded, size: 18),
-                          label: const Text('إجراء تصحيح بصمات',
+                          icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                          label: const Text('إلغاء وحذف الإجازة',
                               style: TextStyle(fontWeight: FontWeight.bold)),
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orange,
+                              backgroundColor: AppTheme.errorRed,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(
@@ -2568,7 +2582,27 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                               elevation: 0),
                         ),
                       ),
+                      const SizedBox(height: 8),
                     ],
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Get.back();
+                          _showAddCorrectionDialog(context, controller, att);
+                        },
+                        icon: Icon(Icons.edit_calendar_rounded, size: 18),
+                        label: const Text('إجراء تصحيح بصمات',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            elevation: 0),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -3798,6 +3832,30 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                           decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
                                           child: Text(statusText, style: TextStyle(color: statusColor, fontSize: 12, fontWeight: FontWeight.bold)),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        IconButton(
+                                          onPressed: () {
+                                            UiUtils.showConfirmDialog(
+                                              title: 'تأكيد الحذف',
+                                              message: 'هل أنت متأكد من حذف هذه الإجازة؟',
+                                              confirmColor: AppTheme.errorRed,
+                                              confirmText: 'حذف',
+                                              onConfirm: () async {
+                                                final res = await controller.deleteVacation(req.id!);
+                                                if (res == null) {
+                                                  UiUtils.showSuccessDialog('تم الحذف', 'تم حذف الإجازة بنجاح.');
+                                                  controller.fetchEmployeeMonthlySummary(employee.id!);
+                                                } else {
+                                                  UiUtils.showErrorDialog('تعذر الحذف', res);
+                                                }
+                                              }
+                                            );
+                                          },
+                                          icon: const Icon(Icons.delete_outline_rounded, size: 20, color: AppTheme.errorRed),
+                                          tooltip: 'حذف الإجازة',
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(),
                                         ),
                                       ],
                                     ),

@@ -256,6 +256,22 @@ class VacationController
                 }
                 break;
 
+            case 'DELETE':
+                if (!empty($id)) {
+                    $result = $this->vacation->deleteVacation($id);
+                    if ($result['success']) {
+                        http_response_code(200);
+                        echo json_encode(["message" => $result['message']]);
+                    } else {
+                        http_response_code(400);
+                        echo json_encode(["message" => $result['message']]);
+                    }
+                } else {
+                    http_response_code(400);
+                    echo json_encode(["message" => "المعرف مطلوب."]);
+                }
+                break;
+
             default:
                 http_response_code(405);
                 echo json_encode(["message" => "الطريقة غير مسموح بها"]);

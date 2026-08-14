@@ -80,14 +80,20 @@ class Vacation
             if ($vacType == 'إجازة سنوية') {
                 if ($status == 'approved' && $oldStatus != 'approved') {
                     // deduct
-                    $q2 = "UPDATE atk_employees SET vacation_credit = vacation_credit - :tm WHERE id = :empId";
+                    $q2 = "UPDATE atk_employees SET 
+                           vacation_credit = vacation_credit - :tm,
+                           monthly_annual_leave_limit_minutes = monthly_annual_leave_limit_minutes - :tm
+                           WHERE id = :empId";
                     $s2 = $this->conn->prepare($q2);
                     $s2->bindParam(":tm", $totalMinutes);
                     $s2->bindParam(":empId", $empId);
                     $s2->execute();
                 } else if ($oldStatus == 'approved' && $status != 'approved') {
                     // refund
-                    $q2 = "UPDATE atk_employees SET vacation_credit = vacation_credit + :tm WHERE id = :empId";
+                    $q2 = "UPDATE atk_employees SET 
+                           vacation_credit = vacation_credit + :tm,
+                           monthly_annual_leave_limit_minutes = monthly_annual_leave_limit_minutes + :tm
+                           WHERE id = :empId";
                     $s2 = $this->conn->prepare($q2);
                     $s2->bindParam(":tm", $totalMinutes);
                     $s2->bindParam(":empId", $empId);
@@ -141,6 +147,52 @@ class Vacation
         $stmt->bindParam(":id", $employee_id);
         $stmt->execute();
         return $stmt->fetchColumn();
+    }
+    public function deleteVacation($id)
+    {
+        $q = "SELECT employee_id, start_date, total_minutes, vacation_type, status FROM " . $this->table_name . " WHERE id = :id";
+        $stmt = $this->conn->prepare($q);
+        $stmt->bindParam(":id", $id);
+        $stmt->execute();
+        $vacationData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$vacationData) return ["success" => false, "message" => "الإجازة غير موجودة."];
+
+        $empId = $vacationData['employee_id'];
+        $startDate = $vacationData['start_date'];
+        $totalMinutes = $vacationData['total_minutes'];
+        $vacType = $vacationData['vacation_type'];
+        $status = $vacationData['status'];
+
+        $q2 = "SELECT id FROM atk_monthly_payrolls WHERE employee_id = :empId AND start_date <= :sd AND end_date >= :sd";
+        $s2 = $this->conn->prepare($q2);
+        $s2->bindParam(":empId", $empId);
+        $s2->bindParam(":sd", $startDate);
+        $s2->execute();
+        
+        if ($s2->fetch()) {
+            return ["success" => false, "message" => "لا يمكن حذف هذه الإجازة لأنها تقع ضمن شهر تم إغلاقه (الإغلاق الشهري)."];
+        }
+
+        $q3 = "DELETE FROM " . $this->table_name . " WHERE id = :id";
+        $s3 = $this->conn->prepare($q3);
+        $s3->bindParam(":id", $id);
+        
+        if ($s3->execute()) {
+            if ($vacType == 'إجازة سنوية' && $status == 'approved') {
+                $q4 = "UPDATE atk_employees SET 
+                       vacation_credit = vacation_credit + :tm,
+                       monthly_annual_leave_limit_minutes = monthly_annual_leave_limit_minutes + :tm
+                       WHERE id = :empId";
+                $s4 = $this->conn->prepare($q4);
+                $s4->bindParam(":tm", $totalMinutes);
+                $s4->bindParam(":empId", $empId);
+                $s4->execute();
+            }
+            return ["success" => true, "message" => "تم حذف الإجازة بنجاح."];
+        }
+
+        return ["success" => false, "message" => "حدث خطأ أثناء حذف الإجازة."];
     }
 }
 ?>

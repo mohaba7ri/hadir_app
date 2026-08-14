@@ -149,6 +149,29 @@ class MyVacationsView extends StatelessWidget {
                                 ),
                               ),
                             ),
+                            SizedBox(width: 4),
+                            IconButton(
+                              onPressed: () {
+                                UiUtils.showConfirmDialog(
+                                  title: 'تأكيد الحذف',
+                                  message: 'هل أنت متأكد من حذف هذه الإجازة؟',
+                                  confirmColor: AppTheme.errorRed,
+                                  confirmText: 'حذف',
+                                  onConfirm: () async {
+                                    final res = await controller.deleteVacation(req.id!);
+                                    if (res == null) {
+                                      UiUtils.showSuccessDialog('تم الحذف', 'تم حذف الإجازة بنجاح.');
+                                    } else {
+                                      UiUtils.showErrorDialog('تعذر الحذف', res);
+                                    }
+                                  }
+                                );
+                              },
+                              icon: Icon(Icons.delete_outline_rounded, size: 20, color: AppTheme.errorRed),
+                              tooltip: 'حذف الإجازة',
+                              padding: EdgeInsets.zero,
+                              constraints: BoxConstraints(),
+                            ),
                           ],
                         ),
                       );
