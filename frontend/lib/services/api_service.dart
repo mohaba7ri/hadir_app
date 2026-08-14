@@ -5,7 +5,7 @@ import 'package:file_picker/file_picker.dart';
 
 class ApiService extends GetConnect {
   static const bool debugMode =
-      false; // Set to true for local, false for production
+      true; // Set to true for local, false for production
 
   static const String baseApiUrl = debugMode
       ? 'http://localhost/attendace/backend' // Note: Use 10.0.2.2 for Android Emulator

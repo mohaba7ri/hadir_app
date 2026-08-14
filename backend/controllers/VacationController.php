@@ -118,7 +118,7 @@ class VacationController
                             $limitStmt = $this->db->prepare("SELECT monthly_annual_leave_limit_minutes FROM atk_employees WHERE id = ?");
                             $limitStmt->execute([$employee_id]);
                             $limitEmp = $limitStmt->fetch(PDO::FETCH_ASSOC);
-                            $monthlyLimit = $limitEmp ? (int)($limitEmp['monthly_annual_leave_limit_minutes'] ?? 750) : 750;
+                            $monthlyLimit = $limitEmp ? (int) ($limitEmp['monthly_annual_leave_limit_minutes'] ?? 750) : 750;
 
                             $dt = new DateTime($start_date);
                             $day = (int) $dt->format('d');
@@ -142,12 +142,12 @@ class VacationController
                             }
                             $cycle_start = sprintf('%04d-%02d-25', $start_year, $start_month);
                             $cycle_end = sprintf('%04d-%02d-24', $year, $month);
-                            
+
                             $sumStmt = $this->db->prepare("SELECT SUM(total_minutes) as used_minutes FROM atk_vacations WHERE employee_id = ? AND vacation_type = 'إجازة سنوية' AND start_date >= ? AND start_date <= ? AND status != 'rejected'");
                             $sumStmt->execute([$employee_id, $cycle_start, $cycle_end]);
                             $sumRow = $sumStmt->fetch(PDO::FETCH_ASSOC);
-                            $usedMinutes = $sumRow ? (int)($sumRow['used_minutes'] ?? 0) : 0;
-                            
+                            $usedMinutes = $sumRow ? (int) ($sumRow['used_minutes'] ?? 0) : 0;
+
                             if (($usedMinutes + $total_minutes) > $monthlyLimit) {
                                 $remaining = $monthlyLimit - $usedMinutes;
                                 $remText = $remaining > 0 ? "يتبقى لك " . number_format($remaining / 60, 2) . " ساعة فقط." : "لقد استنفدت الحد المسموح.";
