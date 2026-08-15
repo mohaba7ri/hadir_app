@@ -81,8 +81,7 @@ class Vacation
                 if ($status == 'approved' && $oldStatus != 'approved') {
                     // deduct
                     $q2 = "UPDATE atk_employees SET 
-                           vacation_credit = vacation_credit - :tm,
-                           monthly_annual_leave_limit_minutes = monthly_annual_leave_limit_minutes - :tm
+                           vacation_credit = vacation_credit - :tm
                            WHERE id = :empId";
                     $s2 = $this->conn->prepare($q2);
                     $s2->bindParam(":tm", $totalMinutes);
@@ -91,8 +90,7 @@ class Vacation
                 } else if ($oldStatus == 'approved' && $status != 'approved') {
                     // refund
                     $q2 = "UPDATE atk_employees SET 
-                           vacation_credit = vacation_credit + :tm,
-                           monthly_annual_leave_limit_minutes = monthly_annual_leave_limit_minutes + :tm
+                           vacation_credit = vacation_credit + :tm
                            WHERE id = :empId";
                     $s2 = $this->conn->prepare($q2);
                     $s2->bindParam(":tm", $totalMinutes);
@@ -181,8 +179,7 @@ class Vacation
         if ($s3->execute()) {
             if ($vacType == 'إجازة سنوية' && $status == 'approved') {
                 $q4 = "UPDATE atk_employees SET 
-                       vacation_credit = vacation_credit + :tm,
-                       monthly_annual_leave_limit_minutes = monthly_annual_leave_limit_minutes + :tm
+                       vacation_credit = vacation_credit + :tm
                        WHERE id = :empId";
                 $s4 = $this->conn->prepare($q4);
                 $s4->bindParam(":tm", $totalMinutes);

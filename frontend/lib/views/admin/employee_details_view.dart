@@ -259,6 +259,12 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
   int _getRemainingMonthlyLimit(EmployeeModel emp, int selectedMonth, int selectedYear) {
     int monthlyLimit = emp.monthlyAnnualLeaveLimitMinutes;
     
+    int startMonth = selectedMonth == 1 ? 12 : selectedMonth - 1;
+    int startYear = selectedMonth == 1 ? selectedYear - 1 : selectedYear;
+    
+    DateTime cycleStart = DateTime(startYear, startMonth, 25);
+    DateTime cycleEnd = DateTime(selectedYear, selectedMonth, 24, 23, 59, 59);
+    
     int usedMinutes = controller.vacationRequests.where((v) {
       if (v.employeeId != emp.id) return false;
       if (v.vacationType != AppConstants.annualLeave) return false;
@@ -266,7 +272,8 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
       
       try {
         final reqStart = DateTime.parse(v.startDate);
-        return reqStart.month == selectedMonth && reqStart.year == selectedYear;
+        return (reqStart.isAfter(cycleStart) || reqStart.isAtSameMomentAs(cycleStart)) && 
+               (reqStart.isBefore(cycleEnd) || reqStart.isAtSameMomentAs(cycleEnd));
       } catch (_) {
         return false;
       }

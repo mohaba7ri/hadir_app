@@ -252,13 +252,20 @@ class MyVacationsView extends StatelessWidget {
     int getMonthlyRemainingBalance(DateTime requestMonth) {
       final int monthlyLimit =
           controller.employeeData.value?.monthlyAnnualLeaveLimitMinutes ?? 750;
+          
+      int startMonth = requestMonth.month == 1 ? 12 : requestMonth.month - 1;
+      int startYear = requestMonth.month == 1 ? requestMonth.year - 1 : requestMonth.year;
+      
+      DateTime cycleStart = DateTime(startYear, startMonth, 25);
+      DateTime cycleEnd = DateTime(requestMonth.year, requestMonth.month, 24, 23, 59, 59);
+          
       final int usedMinutesThisMonth = controller.myVacationRequests.where((v) {
         if (v.vacationType != AppConstants.annualLeave) return false;
         if (v.status != 'pending' && v.status != 'approved') return false;
         try {
           final reqStart = DateTime.parse(v.startDate);
-          return reqStart.month == requestMonth.month &&
-              reqStart.year == requestMonth.year;
+          return (reqStart.isAfter(cycleStart) || reqStart.isAtSameMomentAs(cycleStart)) && 
+                 (reqStart.isBefore(cycleEnd) || reqStart.isAtSameMomentAs(cycleEnd));
         } catch (_) {
           return false;
         }

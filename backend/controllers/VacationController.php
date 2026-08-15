@@ -88,15 +88,22 @@ class VacationController
                 }
 
                 if (empty($total_minutes) && !empty($total_days)) {
-                    $stmt = $this->db->prepare("SELECT special_start_time, special_end_time FROM atk_employees WHERE id = ?");
+                    $stmt = $this->db->prepare("SELECT * FROM atk_employees WHERE id = ?");
                     $stmt->execute([$employee_id]);
                     $emp = $stmt->fetch(PDO::FETCH_ASSOC);
-                    $minutesPerDay = 480;
-                    if ($emp && !empty($emp['special_start_time']) && !empty($emp['special_end_time'])) {
-                        $st = strtotime("2000-01-01 " . $emp['special_start_time']);
-                        $et = strtotime("2000-01-01 " . $emp['special_end_time']);
-                        $minutesPerDay = ($et - $st) / 60;
+
+                    $settStmt = $this->db->prepare("SELECT * FROM atk_settings LIMIT 1");
+                    $settStmt->execute();
+                    $settings = $settStmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+                    require_once __DIR__ . '/../models/AttendanceCalculator.php';
+
+                    if ($emp && !empty($emp['is_flexible'])) {
+                        $minutesPerDay = (float) ($emp['required_hours'] ?? 8.00) * 60;
+                    } else {
+                        $minutesPerDay = AttendanceCalculator::getWorkDayDuration($emp ?: [], $settings);
                     }
+
                     $total_minutes = $total_days * $minutesPerDay;
                 }
 
