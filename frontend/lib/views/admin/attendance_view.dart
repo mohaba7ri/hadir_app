@@ -1057,7 +1057,33 @@ class _AttendanceViewState extends State<AttendanceView> {
                               UiUtils.showSuccessDialog('تم بنجاح',
                                   'تم تحويل يوم الغياب إلى ${selectedType.value}');
                             } else {
-                              UiUtils.showErrorDialog('تعذر حفظ الإجازة', errorMsg);
+                              if (errorMsg is Map && errorMsg['error_type'] == 'limit_exceeded_with_remaining' && errorMsg['remaining_minutes'] != null && errorMsg['remaining_minutes'] > 0) {
+                                int remaining = errorMsg['remaining_minutes'];
+                                Get.defaultDialog(
+                                  title: 'تجاوز الحد المسموح',
+                                  middleText: '${errorMsg['message']}\n\nهل تود عمل طلب إجازة بالوقت المتبقي فقط؟',
+                                  textConfirm: 'نعم',
+                                  textCancel: 'لا',
+                                  confirmTextColor: Colors.white,
+                                  onConfirm: () async {
+                                    Get.back();
+                                    request.totalMinutes = remaining;
+                                    request.isHourly = true;
+                                    request.totalDays = 0;
+                                    final retryRes = await controller.addVacationRequestWithReason(request, attachmentFile: selectedAttachmentFile.value);
+                                    if (retryRes == null) {
+                                        Get.back();
+                                        UiUtils.showSuccessDialog('تم بنجاح', 'تم تحويل يوم الغياب إلى ${selectedType.value} بالوقت المتبقي');
+                                    } else {
+                                        String msg = retryRes is Map ? (retryRes['message']?.toString() ?? 'خطأ') : retryRes.toString();
+                                        UiUtils.showErrorDialog('تعذر حفظ الإجازة', msg);
+                                    }
+                                  }
+                                );
+                              } else {
+                                String msg = errorMsg is Map ? (errorMsg['message']?.toString() ?? 'خطأ') : errorMsg.toString();
+                                UiUtils.showErrorDialog('تعذر حفظ الإجازة', msg);
+                              }
                             }
                           },
                     style: ElevatedButton.styleFrom(
@@ -1406,7 +1432,33 @@ class _AttendanceViewState extends State<AttendanceView> {
                                     Get.back();
                                     UiUtils.showSuccessDialog('تم التغطية بنجاح', 'تم تطبيق الإجازة واحتساب الدقائق المطلوبة.');
                                   } else {
-                                    UiUtils.showErrorDialog('خطأ', errorMsg);
+                                    if (errorMsg is Map && errorMsg['error_type'] == 'limit_exceeded_with_remaining' && errorMsg['remaining_minutes'] != null && errorMsg['remaining_minutes'] > 0) {
+                                      int remaining = errorMsg['remaining_minutes'];
+                                      Get.defaultDialog(
+                                        title: 'تجاوز الحد المسموح',
+                                        middleText: '${errorMsg['message']}\n\nهل تود عمل طلب إجازة بالوقت المتبقي فقط؟',
+                                        textConfirm: 'نعم',
+                                        textCancel: 'لا',
+                                        confirmTextColor: Colors.white,
+                                        onConfirm: () async {
+                                          Get.back();
+                                          request.totalMinutes = remaining;
+                                          request.isHourly = true;
+                                          request.totalDays = 0;
+                                          final retryRes = await controller.addVacationRequestWithReason(request, attachmentFile: selectedAttachmentFile.value);
+                                          if (retryRes == null) {
+                                              Get.back();
+                                              UiUtils.showSuccessDialog('تم التغطية بنجاح', 'تم تطبيق الإجازة واحتساب الدقائق المتبقية فقط.');
+                                          } else {
+                                              String msg = retryRes is Map ? (retryRes['message']?.toString() ?? 'خطأ') : retryRes.toString();
+                                              UiUtils.showErrorDialog('تعذر حفظ التغطية', msg);
+                                          }
+                                        }
+                                      );
+                                    } else {
+                                      String msg = errorMsg is Map ? (errorMsg['message']?.toString() ?? 'خطأ') : errorMsg.toString();
+                                      UiUtils.showErrorDialog('خطأ', msg);
+                                    }
                                   }
                                 },
                           style: ElevatedButton.styleFrom(

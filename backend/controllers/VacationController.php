@@ -156,10 +156,15 @@ class VacationController
                             $usedMinutes = $sumRow ? (int) ($sumRow['used_minutes'] ?? 0) : 0;
 
                             if (($usedMinutes + $total_minutes) > $monthlyLimit) {
-                                $remaining = $monthlyLimit - $usedMinutes;
+                                $remaining = max(0, $monthlyLimit - $usedMinutes);
                                 $remText = $remaining > 0 ? "يتبقى لك " . number_format($remaining / 60, 2) . " ساعة فقط." : "لقد استنفدت الحد المسموح.";
                                 http_response_code(400);
-                                echo json_encode(["status" => "error", "message" => "لقد تجاوزت الحد الشهري للإجازة السنوية (" . number_format($monthlyLimit / 60, 2) . " ساعة). $remText"]);
+                                echo json_encode([
+                                    "status" => "error", 
+                                    "error_type" => "limit_exceeded_with_remaining",
+                                    "remaining_minutes" => $remaining,
+                                    "message" => "لقد تجاوزت الحد الشهري للإجازة السنوية (" . number_format($monthlyLimit / 60, 2) . " ساعة). $remText"
+                                ]);
                                 break;
                             }
                         }

@@ -675,7 +675,7 @@ class AdminController extends GetxController {
     }
   }
 
-  Future<String?> addVacationRequestWithReason(VacationRequestModel request,
+  Future<dynamic> addVacationRequestWithReason(VacationRequestModel request,
       {PlatformFile? attachmentFile}) async {
     isLoading.value = true;
     try {
@@ -705,7 +705,7 @@ class AdminController extends GetxController {
 
       if (res != null) {
         if (res is Map && res['status'] == 'error') {
-          return res['message']?.toString() ?? 'خطأ غير معروف من الخادم';
+          return res;
         }
         fetchVacationRequests();
         fetchEmployees();

@@ -9,7 +9,7 @@ class Database
     private $host = "localhost";
 
     // Local DB credentials
-    private $local_db_name = "attendace";
+    private $local_db_name = "\tattendance";
     private $local_username = "root";
     private $local_password = "";
 

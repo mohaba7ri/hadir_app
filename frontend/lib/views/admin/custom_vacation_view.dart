@@ -240,14 +240,15 @@ class _CustomVacationViewState extends State<CustomVacationView> {
         employeeName: emp.name,
       );
 
-      String? errorReason = await controller.addVacationRequestWithReason(request,
+      dynamic errorReason = await controller.addVacationRequestWithReason(request,
           attachmentFile: _attachmentFile.value);
       
       if (errorReason == null) {
         successCount++;
       } else {
         failCount++;
-        failedDetails.add('• ${emp.name}: $errorReason');
+        String msg = errorReason is Map ? (errorReason['message']?.toString() ?? 'خطأ') : errorReason.toString();
+        failedDetails.add('• ${emp.name}: $msg');
       }
         
       currentProgress.value++;
