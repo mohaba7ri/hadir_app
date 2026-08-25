@@ -323,14 +323,12 @@ class MyVacationsView extends StatelessWidget {
             int diff = e.difference(s).inMinutes;
             if (diff < 0) diff += 24 * 60;
             calculatedMinutes.value = diff;
-            hasEnoughBalance.value =
-                selectedType.value != AppConstants.annualLeave ||
-                    getRemainingBalance() >= diff;
             final reqMonth =
                 DateTime.tryParse(startController.text) ?? DateTime.now();
-            hasEnoughMonthlyBalance.value =
+            hasEnoughBalance.value =
                 selectedType.value != AppConstants.annualLeave ||
                     getMonthlyRemainingBalance(reqMonth) >= diff;
+            hasEnoughMonthlyBalance.value = hasEnoughBalance.value;
           } catch (e) {
             calculatedMinutes.value = 0;
           }
@@ -348,14 +346,12 @@ class MyVacationsView extends StatelessWidget {
               int dailyMins = controller.getSystemWorkDayDurationInMinutes();
               int totalMins = diff * dailyMins;
               calculatedMinutes.value = totalMins;
-              hasEnoughBalance.value =
-                  selectedType.value != AppConstants.annualLeave ||
-                      getRemainingBalance() >= totalMins;
               final reqMonth =
                   DateTime.tryParse(startController.text) ?? DateTime.now();
-              hasEnoughMonthlyBalance.value =
+              hasEnoughBalance.value =
                   selectedType.value != AppConstants.annualLeave ||
                       getMonthlyRemainingBalance(reqMonth) >= totalMins;
+              hasEnoughMonthlyBalance.value = hasEnoughBalance.value;
             }
           } catch (e) {
             calculatedDays.value = 0;
@@ -510,15 +506,19 @@ class MyVacationsView extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('الرصيد المتاح:',
+                              const Text('الحد الشهري المتاح:',
                                   style: TextStyle(
                                       fontSize: 12,
                                       color: AppTheme.textSecondary)),
-                              Text(
-                                  '${UiUtils.formatDaysApproximate(getRemainingBalance() / controller.getSystemWorkDayDurationInMinutes())} (${UiUtils.formatDuration(getRemainingBalance())})',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 13)),
+                              Obx(() {
+                                final reqMonth = DateTime.tryParse(startController.text) ?? DateTime.now();
+                                final rem = getMonthlyRemainingBalance(reqMonth);
+                                return Text(
+                                    UiUtils.formatDuration(rem),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13));
+                              }),
                             ],
                           ),
                           const Divider(),
