@@ -273,8 +273,8 @@ class AttendanceEngine
 
         $partial_result = $this->calculatePeriod($employee_id, $dynamic_start, $split_end_date, $month, $year);
 
-        // Save to DB
-        $stmtIns = $this->db->prepare("INSERT INTO atk_monthly_payrolls (employee_id, month, year, start_date, end_date, salary_snapshot, work_days_per_week_snapshot, totals_json, daily_data_json) VALUES (:emp, :mo, :yr, :sd, :ed, :sal, :wd, :tot, :day)");
+        // Save to DB (INSERT IGNORE guarantees zero duplicate insertions at the database engine level)
+        $stmtIns = $this->db->prepare("INSERT IGNORE INTO atk_monthly_payrolls (employee_id, month, year, start_date, end_date, salary_snapshot, work_days_per_week_snapshot, totals_json, daily_data_json) VALUES (:emp, :mo, :yr, :sd, :ed, :sal, :wd, :tot, :day)");
         $stmtIns->execute([
             ':emp' => $employee_id,
             ':mo' => $month,
