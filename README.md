@@ -1,61 +1,188 @@
-# ProAttend - Professional Attendance & Leave Management System
+# 🏢 ProAttend / Hadir (حاضر) - Biometric Attendance & Payroll Management System
 
-A highly robust, comprehensive, and natively localized (Arabic) Enterprise Attendance Management System. ProAttend is engineered to bridge the gap between complex HR logic and user-friendly interfaces, offering seamless employee tracking, automated financial penalty calculations, and highly customizable shift structures. 
+[![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter)](https://flutter.dev)
+[![PHP](https://img.shields.io/badge/PHP-7.4%2B%20%2F%208.x-777BB4?logo=php)](https://www.php.net)
+[![MySQL](https://img.shields.io/badge/MySQL-MariaDB-4479A1?logo=mysql)](https://www.mysql.com)
+[![License](https://img.shields.io/badge/License-Proprietary-red.svg)]()
 
-Built with **Flutter** for a beautiful, responsive, cross-platform frontend and powered by a highly optimized custom **PHP API** backend, this system eliminates the need for manual HR calculations while providing unparalleled transparency for both employees and management.
-
----
-
-## 🌟 Why ProAttend?
-
-Traditional attendance systems often just record "check-in" and "check-out" times, leaving HR to manually calculate delays, early exits, and their respective salary deductions. ProAttend automates this entire pipeline. From the moment an employee punches in to the moment payroll is generated, every minute is tracked, calculated, and financially accounted for based on dynamic, customizable rules.
+**ProAttend (حاضر)** is an enterprise-grade Attendance, Payroll, and Vacation Management Solution built with a modern **Flutter (Web & Mobile)** frontend, a high-performance **PHP PDO REST API** backend, and real-time **ZKTeco Biometric Hardware Receiver** integration.
 
 ---
 
-## 🚀 Core Features
+## 🌟 Key Features
 
-### 📊 Comprehensive Admin Dashboard & Analytics
-- **Live Monitoring:** Real-time visibility into the daily workforce status (Present, Absent, Late, Early Exit, Holiday).
-- **Data Filtering:** Advanced search and filtering mechanisms by employee, department, and custom month/year date ranges.
-- **Monthly Employee Summaries:** Deep dive into individual employee records with a unified view of their monthly attendance, total late minutes, total early exits, and exact calculated financial discounts.
-
-### 💰 Automated Financial Deductions Engine
-- **Minute-by-Minute Salary Calculus:** Automatically calculates the exact financial value of a single working minute based on the employee's monthly salary and the configured working days.
-- **Smart Penalty Application:** Automatically applies financial discounts for unexcused late arrivals, unapproved early exits, and full-day unexcused absences.
-- **Override Capabilities:** Administrators can override automatic penalties by converting absences into approved leaves or excusing specific delays on a case-by-case basis.
-
-### 🏖️ Advanced Vacation & Coverage Workflows
-- **Multi-Tiered Leave Policies:** Native support for Annual Leaves, Business Missions, Sick Leaves, and Unpaid Leaves.
-- **Hourly Vacations (Delay Coverage):** A standout feature that allows employees to request "partial vacations" (e.g., 45 minutes) specifically to cover a late arrival or early exit, automatically reversing the financial penalty without consuming a full day of their leave balance.
-- **Secure Attachments:** Built-in file and image upload support for leave requests, allowing employees to easily attach medical reports or official documents for management review.
-- **Automated Balance Tracking:** The system strictly enforces leave limits, automatically calculating remaining vacation credit (in days and minutes) and preventing over-requesting.
-
-### ⏱️ Dynamic Shift & Working Hours Management
-- **Flexible Shift Support:** Accommodates both fixed-schedule employees (e.g., 08:00 AM - 04:00 PM) and flexible-schedule employees who simply need to complete a set number of hours per day.
-- **Custom Individual Shifts:** Ability to override global company hours and assign unique start and end times to specific employees.
-- **Ramadan Mode:** A one-click global setting that instantly switches the entire organization's logic to a custom, reduced-hour schedule for the holy month of Ramadan.
-- **National & Recurring Holidays:** Easily define company-wide holidays (one-time or annually recurring) where employee absence is fully excused.
-
-### 🔄 Data Synchronization & Correction
-- **Machine Integration Ready:** Built-in JSON import endpoints designed to seamlessly sync raw punch data from external fingerprint or facial recognition machines.
-- **Correction Requests:** Employees who forget to punch in or out can submit formal "Correction Requests" through their portal. Once approved by an admin, the system dynamically recalculates their attendance and financial status for that day.
-
-### 👥 Role-Based Portals
-- **Employee Portal:** A clean, intuitive dashboard where employees can track their own attendance, view their exact financial deductions, check their remaining leave balance, and submit requests.
-- **Admin Portal:** A powerful command center with full control over organizational data, department management, employee settings, and a unified inbox for all pending approvals.
+- ⏱️ **Biometric Hardware Sync**: Real-time attendance logs ingested directly from ZKTeco biometric fingerprint/face devices.
+- 💵 **Automated Monthly Payroll Engine**: Automatic closing of payroll cycles on the 25th of every month with full snapshot preservation.
+- 🌴 **Cumulative Roll-Over Annual Leave Engine**: Dynamic, month-by-month capped roll-over engine starting from Month 8/2026 (`2026-07-25`). Unused credit rolls over while past overages do not penalize future month quotas.
+- 🔔 **FCM v1 Push Notifications**: Instant real-time alerts for leave approvals, attendance updates, and administrative notices.
+- 📊 **Flexible & Standard Shift Models**: Custom work schedules, flexible required hours, dynamic minute-discount penalty rates, and automatic early exit/late calculations.
+- 📱 **Cross-Platform**: Responsive Web Admin Dashboard and Mobile App (Android/iOS) for Employees.
 
 ---
 
-## 🛠️ Technology Highlights
+## 📐 System Architecture
 
-ProAttend leverages modern technologies to ensure lightning-fast performance, rock-solid stability, and a seamless user experience.
+```mermaid
+graph TD
+    subgraph Client Layer
+        A[Flutter Web Admin Dashboard]
+        B[Flutter Employee Mobile App]
+    end
 
-- **Cross-Platform Frontend:** Built with **Flutter**, allowing the application to run beautifully and natively across Desktop, Web, and Mobile from a single, unified codebase.
-- **Reactive State Management:** Utilizes **GetX** to deliver an incredibly smooth, highly responsive, and dynamic user interface.
-- **High-Performance Backend:** Powered by a highly optimized, lightweight **PHP REST API** designed for ultimate speed and reliability, seamlessly handling massive attendance aggregations.
-- **Scalable Database:** Uses **MySQL** for robust, secure, and efficient data storage capable of handling complex enterprise queries.
-- **Premium UI/UX Design:** Features a polished, modern aesthetic with contextual dialogs, intuitive interfaces, and clear visual data presentation.
+    subgraph Backend REST API
+        C[PHP PDO REST Controller]
+        D[AttendanceEngine Service]
+        E[VacationController & Calculator]
+    end
+
+    subgraph Integration & Hardware
+        F[ZKTeco Biometric Receiver]
+        G[Firebase Cloud Messaging v1]
+    end
+
+    subgraph Database Layer
+        H[(MySQL / MariaDB Database)]
+    end
+
+    A <-->|HTTP REST JSON| C
+    B <-->|HTTP REST JSON| C
+    F -->|ADMS / HTTP Push| C
+    C <--> D
+    C <--> E
+    D <--> H
+    E <--> H
+    C -->|Push Notifications| G
+```
 
 ---
 
-*Designed and developed to set a new standard in localized HR software solutions.*
+## 🔄 Monthly Payroll Cycle (25th to 24th)
+
+The payroll cycle runs from the **25th of Month $M-1$** to the **24th of Month $M$**.
+
+```mermaid
+flowchart LR
+    A["Cycle Start (25th Month M-1)"] --> B["Daily Biometric Ingestion & Attendance Log"]
+    B --> C["On-The-Fly Penalty & Deduction Calculation"]
+    C --> D["25th New Month Arrives"]
+    D --> E{"Auto-Payroll Enabled?"}
+    E -- Yes --> F["Execute Auto-Payroll Snapshot & Close Month M-1"]
+    E -- No --> G["Manual Admin Monthly Payroll Review"]
+    F --> H["Save to atk_monthly_payrolls (Unique Key Safe)"]
+    G --> H
+```
+
+---
+
+## 🌴 Cumulative Roll-Over Leave Engine
+
+Effective from **Month 8 of 2026 (`2026-07-25`)**, the leave engine dynamically calculates remaining limits on the fly:
+
+```mermaid
+flowchart TD
+    Start["Request / View Month (Y, M)"] --> BaselineCheck{"Date >= 2026-07-25?"}
+    BaselineCheck -- No --> SingleMonth["Single Cycle Limit (monthly_annual_leave_limit_minutes)"]
+    BaselineCheck -- Yes --> LoopStart["Start Month-by-Month Loop from Month 8/2026"]
+    
+    LoopStart --> Grant["Add Monthly Base Quota (+monthly_annual_leave_limit_minutes)"]
+    Grant --> Subtract["Subtract Used Annual Vacations in Month"]
+    Subtract --> CapCheck{"Is Running Balance < 0?"}
+    CapCheck -- Yes --> ResetZero["Cap Balance at 0 (Ignore Past Debt/Overage)"]
+    CapCheck -- No --> KeepBalance["Keep Positive Unused Balance (Roll Over)"]
+    
+    ResetZero --> NextMonth{"Target Month Reached?"}
+    KeepBalance --> NextMonth
+    
+    NextMonth -- No --> Grant
+    NextMonth -- Yes --> Output["Return Current Month Available Balance"]
+```
+
+---
+
+## 🗄️ Database Schema & Key Tables
+
+```mermaid
+erDiagram
+    atk_employees ||--o{ atk_attendance : "has logs"
+    atk_employees ||--o{ atk_vacations : "requests"
+    atk_employees ||--o{ atk_monthly_payrolls : "receives"
+    atk_departments ||--o{ atk_employees : "belongs to"
+
+    atk_employees {
+        int id PK
+        string name
+        decimal salary
+        int monthly_annual_leave_limit_minutes
+        int vacation_credit
+        int work_days_per_week
+        string status
+    }
+
+    atk_vacations {
+        int id PK
+        int employee_id FK
+        date start_date
+        date end_date
+        string vacation_type
+        int total_minutes
+        string status
+    }
+
+    atk_monthly_payrolls {
+        int id PK
+        int employee_id FK
+        int month
+        int year
+        date start_date
+        date end_date
+        text totals_json
+        longtext daily_data_json
+        string status
+    }
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1. Prerequisites
+- **Web Server**: Apache / Nginx with PHP 7.4+ or PHP 8.x (XAMPP supported)
+- **Database**: MySQL 5.7+ or MariaDB 10.4+
+- **Frontend**: Flutter SDK 3.x+
+
+### 2. Backend Installation
+1. Clone the repository into your web server directory (`htdocs` or `/var/www/html`):
+   ```bash
+   git clone https://github.com/mohaba7ri/hadir_app.git attendace
+   ```
+2. Import the database schema:
+   - Import `backend/database/schema.sql` into MySQL database `attendance`.
+   - Run migration script: `backend/database/alter_auto_payroll_settings.sql`.
+
+3. Configure database connection in `backend/database/db.php`:
+   ```php
+   private $local_db_name = "attendance";
+   private $local_username = "root";
+   private $local_password = "";
+   ```
+
+### 3. Frontend Installation
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   flutter pub get
+   ```
+2. Run locally in debug mode:
+   ```bash
+   flutter run -d chrome
+   ```
+3. Build production web bundle:
+   ```bash
+   flutter build web --release
+   ```
+
+---
+
+## 🛡️ License
+
+Proprietary Software - All Rights Reserved © 2026 ProAttend / Hadir Team.
