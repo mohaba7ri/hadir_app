@@ -354,7 +354,7 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                     ),
                     SizedBox(height: 4),
                     Text(
-                      'الرقم الوظيفي: #${employee.id} | الراتب: ${employee.salary} ر.س | رصيد الإجازات: ${UiUtils.formatDaysApproximate(employee.vacationCredit / controller.getSystemWorkDayDurationInMinutes())} (${UiUtils.formatDuration(employee.vacationCredit)})',
+                      'الرقم الوظيفي: #${employee.id} | الراتب: ${employee.salary} ر.س',
                       style: TextStyle(
                           color: AppTheme.textSecondary,
                           fontSize: 12,

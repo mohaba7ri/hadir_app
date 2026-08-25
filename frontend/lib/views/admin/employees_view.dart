@@ -193,7 +193,7 @@ class EmployeesView extends StatelessWidget {
                             ],
                           ),
                           subtitle: Text(
-                              '${emp.salary} ر.س | رصيد إجازات: ${UiUtils.formatDaysApproximate(emp.vacationCredit / controller.getSystemWorkDayDurationInMinutes())} (${UiUtils.formatDuration(emp.vacationCredit)})'
+                              '${emp.salary} ر.س | حد الإجازة الشهري: ${UiUtils.formatDuration(emp.monthlyAnnualLeaveLimitMinutes)}'
                               '${emp.specialStartTime != null ? ' | بدء: ${emp.specialStartTime}' : ''}'
                               '${emp.specialEndTime != null ? ' | انتهاء: ${emp.specialEndTime}' : ''}'),
                           trailing: SizedBox(
