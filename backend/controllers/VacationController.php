@@ -198,28 +198,54 @@ class VacationController
                                 $usedMinutes = $sumRow ? (int) ($sumRow['used_minutes'] ?? 0) : 0;
                                 $effectiveLimit = $monthlyLimit;
                             } else {
-                                // Month 8 of 2026 onwards: Cumulative roll-over accrual
-                                $monthsElapsed = ($year - $baselineYear) * 12 + ($month - $baselineMonth) + 1;
-                                $effectiveLimit = $monthsElapsed * $monthlyLimit;
+                                // Month 8 of 2026 onwards: Month-by-month capped roll-over accrual
+                                // Positive unused limit rolls over; overages from past months do NOT reduce new month's quota
+                                $runningBalance = 0;
+                                $curY = $baselineYear;
+                                $curM = $baselineMonth;
 
-                                $sumStmt = $this->db->prepare("SELECT SUM(total_minutes) as used_minutes FROM atk_vacations WHERE employee_id = ? AND vacation_type = 'إجازة سنوية' AND start_date >= ? AND status != 'rejected'");
-                                $sumStmt->execute([$employee_id, $baselineCycleStart]);
-                                $sumRow = $sumStmt->fetch(PDO::FETCH_ASSOC);
-                                $usedMinutes = $sumRow ? (int) ($sumRow['used_minutes'] ?? 0) : 0;
-                            }
+                                while (true) {
+                                    if ($curY > $year || ($curY == $year && $curM > $month)) {
+                                        break;
+                                    }
 
-                            if (($usedMinutes + $total_minutes) > $effectiveLimit) {
-                                $remaining = max(0, $effectiveLimit - $usedMinutes);
-                                $remText = $remaining > 0 ? "يتبقى لك " . $this->formatMinutesToText($remaining) . " فقط." : "لقد استنفدت الحد المسموح التراكمي.";
-                                $limitText = $this->formatMinutesToText($effectiveLimit);
-                                http_response_code(400);
-                                echo json_encode([
-                                    "status" => "error", 
-                                    "error_type" => "limit_exceeded_with_remaining",
-                                    "remaining_minutes" => $remaining,
-                                    "message" => "لقد تجاوزت رصيد الإجازة السنوية التراكمي المتاح ($limitText). $remText"
-                                ]);
-                                break;
+                                    $runningBalance += $monthlyLimit;
+
+                                    $startM = ($curM == 1) ? 12 : $curM - 1;
+                                    $startY = ($curM == 1) ? $curY - 1 : $curY;
+                                    $cStart = sprintf('%04d-%02d-25', $startY, $startM);
+                                    $cEnd = sprintf('%04d-%02d-24', $curY, $curM);
+
+                                    $sumStmt = $this->db->prepare("SELECT SUM(total_minutes) as used_minutes FROM atk_vacations WHERE employee_id = ? AND vacation_type = 'إجازة سنوية' AND start_date >= ? AND start_date <= ? AND status != 'rejected'");
+                                    $sumStmt->execute([$employee_id, $cStart, $cEnd]);
+                                    $usedRow = $sumStmt->fetch(PDO::FETCH_ASSOC);
+                                    $usedInMonth = $usedRow ? (int) ($usedRow['used_minutes'] ?? 0) : 0;
+
+                                    if ($curY == $year && $curM == $month) {
+                                        if (($usedInMonth + $total_minutes) > $runningBalance) {
+                                            $remaining = max(0, $runningBalance - $usedInMonth);
+                                            $remText = $remaining > 0 ? "يتبقى لك " . $this->formatMinutesToText($remaining) . " فقط." : "لقد استنفدت الحد المسموح التراكمي لهذا الشهر.";
+                                            $limitText = $this->formatMinutesToText($runningBalance);
+                                            http_response_code(400);
+                                            echo json_encode([
+                                                "status" => "error", 
+                                                "error_type" => "limit_exceeded_with_remaining",
+                                                "remaining_minutes" => $remaining,
+                                                "message" => "لقد تجاوزت رصيد الإجازة السنوية المتاح ($limitText). $remText"
+                                            ]);
+                                            break 2;
+                                        }
+                                    } else {
+                                        // For past months, subtract used and cap remaining balance at 0 (ignore past overages)
+                                        $runningBalance = max(0, $runningBalance - $usedInMonth);
+                                    }
+
+                                    $curM++;
+                                    if ($curM > 12) {
+                                        $curM = 1;
+                                        $curY++;
+                                    }
+                                }
                             }
                         }
 

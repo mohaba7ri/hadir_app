@@ -569,7 +569,7 @@ class AttendanceEngine
                 $total_hv = $hl + $he + $hb;
                 $dailyAbsenceRate = ($daysInMonthParam > 0) ? ($salary / $daysInMonthParam) : 0;
                 $minuteAbsenceRate = ($work_duration > 0) ? ($dailyAbsenceRate / $work_duration) : 0;
-                
+
                 if ($total_hv > 0) {
                     $remaining_mins = max(0, $work_duration - $total_hv);
                     if ($remaining_mins > 0) {
@@ -590,7 +590,7 @@ class AttendanceEngine
                 } else {
                     $discount = $dailyAbsenceRate;
                 }
-                
+
                 $totals['absent_days']++;
                 $totals['absence_deduction'] += $discount;
             } else if ($d['status'] === 'off') {
@@ -635,7 +635,7 @@ class AttendanceEngine
 
         $today = new DateTime();
         $currentDay = (int) $today->format('d');
-        
+
         if ($currentDay >= 25) {
             $targetMonth = (int) $today->format('m');
             $targetYear = (int) $today->format('Y');

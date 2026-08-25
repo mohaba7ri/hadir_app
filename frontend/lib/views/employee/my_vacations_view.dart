@@ -287,21 +287,44 @@ class MyVacationsView extends StatelessWidget {
 
         return monthlyLimit - usedMinutesThisMonth;
       } else {
-        int monthsElapsed = (reqYear - baselineYear) * 12 + (reqMonth - baselineMonth) + 1;
-        int effectiveLimit = monthsElapsed * monthlyLimit;
+        int runningBalance = 0;
+        int curY = baselineYear;
+        int curM = baselineMonth;
 
-        final int usedMinutesCumulative = controller.myVacationRequests.where((v) {
-          if (v.vacationType != AppConstants.annualLeave) return false;
-          if (v.status != 'pending' && v.status != 'approved') return false;
-          try {
-            final reqStart = DateTime.parse(v.startDate);
-            return reqStart.isAfter(baselineCycleStart) || reqStart.isAtSameMomentAs(baselineCycleStart);
-          } catch (_) {
-            return false;
+        while (true) {
+          if (curY > reqYear || (curY == reqYear && curM > reqMonth)) {
+            break;
           }
-        }).fold(0, (sum, v) => sum + v.totalMinutes);
 
-        return effectiveLimit - usedMinutesCumulative;
+          runningBalance += monthlyLimit;
+
+          int startM = (curM == 1) ? 12 : curM - 1;
+          int startY = (curM == 1) ? curY - 1 : curY;
+          DateTime cStart = DateTime(startY, startM, 25);
+          DateTime cEnd = DateTime(curY, curM, 24, 23, 59, 59);
+
+          int usedInMonth = controller.myVacationRequests.where((v) {
+            if (v.vacationType != AppConstants.annualLeave) return false;
+            if (v.status != 'pending' && v.status != 'approved') return false;
+            try {
+              final reqStart = DateTime.parse(v.startDate);
+              return (reqStart.isAfter(cStart) || reqStart.isAtSameMomentAs(cStart)) &&
+                     (reqStart.isBefore(cEnd) || reqStart.isAtSameMomentAs(cEnd));
+            } catch (_) {
+              return false;
+            }
+          }).fold(0, (sum, v) => sum + v.totalMinutes);
+
+          runningBalance = (runningBalance - usedInMonth).clamp(0, 9999999);
+
+          curM++;
+          if (curM > 12) {
+            curM = 1;
+            curY++;
+          }
+        }
+
+        return runningBalance;
       }
     }
 
