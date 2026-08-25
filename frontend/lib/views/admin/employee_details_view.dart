@@ -1671,7 +1671,7 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                                   SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
-                                      'رصيد إجازات الموظف المتاح حالياً: ${UiUtils.formatDaysApproximate(employee.vacationCredit / controller.getSystemWorkDayDurationInMinutes())} (${UiUtils.formatDuration(employee.vacationCredit)})',
+                                      'المتبقي من حد الإجازة السنوية لشهر ${_getMonthNameArabic(controller.selectedMonth.value)}: ${UiUtils.formatDuration(_getRemainingMonthlyLimit(employee, controller.selectedMonth.value, controller.selectedYear.value))}',
                                       style: TextStyle(
                                           fontSize: 12,
                                           color: AppTheme.primaryTeal,

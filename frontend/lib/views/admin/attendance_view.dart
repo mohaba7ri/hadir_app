@@ -1275,7 +1275,7 @@ class _AttendanceViewState extends State<AttendanceView> {
                                   SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
-                                      'رصيد إجازات الموظف المتاح حالياً: ${UiUtils.formatDaysApproximate(employee.vacationCredit / controller.getSystemWorkDayDurationInMinutes())} (${UiUtils.formatDuration(employee.vacationCredit)})',
+                                      'حد الإجازة السنوية الشهري للموظف: ${UiUtils.formatDuration(employee.monthlyAnnualLeaveLimitMinutes)}',
                                       style: TextStyle(fontSize: 12, color: AppTheme.primaryTeal, fontWeight: FontWeight.bold, height: 1.4),
                                     ),
                                   ),
