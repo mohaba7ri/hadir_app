@@ -59,6 +59,16 @@ require_once 'database/db.php';
 $database = new Database();
 $db = $database->getConnection();
 
+// Lightweight background auto-check for monthly payroll closings
+try {
+    require_once __DIR__ . '/models/Setting.php';
+    require_once __DIR__ . '/services/AttendanceEngine.php';
+    $autoEngine = new AttendanceEngine($db);
+    $autoEngine->autoRunMonthlyPayrollClosingForAll();
+} catch (Throwable $t) {
+    // Non-blocking
+}
+
 $routes = [
     'employees' => 'routes/employees_route.php',
     'attendance' => 'routes/attendance_route.php',

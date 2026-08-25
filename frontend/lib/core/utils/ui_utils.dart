@@ -68,17 +68,24 @@ class UiUtils {
     );
   }
 
-  static void showErrorDialog(String title, String message) {
+  static void showErrorDialog(String title, dynamic message) {
+    String msgText = '';
+    if (message is Map) {
+      msgText = message['message']?.toString() ?? message.toString();
+    } else {
+      msgText = message?.toString() ?? 'حدث خطأ غير متوقع';
+    }
+
     Get.dialog(
       AlertDialog(
         title: Row(
           children: [
-            Icon(Icons.error, color: Colors.red, size: 28),
-            SizedBox(width: 12),
+            const Icon(Icons.error, color: Colors.red, size: 28),
+            const SizedBox(width: 12),
             Text(title),
           ],
         ),
-        content: Text(message),
+        content: Text(msgText),
         actions: [
           TextButton(
             onPressed: () => Get.back(),

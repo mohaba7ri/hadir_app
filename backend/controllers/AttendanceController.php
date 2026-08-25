@@ -97,9 +97,16 @@ class AttendanceController
 
                 $row['discount'] = $row['late_discount'] + $row['early_exit_discount'];
 
-                // For absent records, calculate total daily discount if not already set
+                // For absent records, calculate total daily discount considering partial hourly vacations
                 if ($row['status'] == 'absent') {
-                    $row['discount'] = (float) $row['salary'] / $divisor;
+                    $total_hv = $hourlyLate + $hourlyEarly + $hourlyBoth;
+                    $remaining_mins = max(0, $workDuration - $total_hv);
+                    if ($remaining_mins > 0 && $workDuration > 0 && $divisor > 0) {
+                        $minuteRate = (float) $row['salary'] / $divisor / $workDuration;
+                        $row['discount'] = $remaining_mins * $minuteRate;
+                    } else {
+                        $row['discount'] = 0.0;
+                    }
                 }
 
                 $data[] = $row;

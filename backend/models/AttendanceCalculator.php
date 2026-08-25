@@ -84,8 +84,11 @@ class AttendanceCalculator
             }
         }
 
-        if (!$checkOut)
+        if (empty($checkIn) && empty($checkOut)) {
+            $status = 'absent';
+        } else if (!$checkOut) {
             $status = 'incomplete';
+        }
 
         return [
             'late_minutes' => $late_minutes,

@@ -5,7 +5,7 @@ import 'package:file_picker/file_picker.dart';
 
 class ApiService extends GetConnect {
   static const bool debugMode =
-      true; // Set to true for local, false for production
+      false; // Set to true for local, false for production
 
   static const String baseApiUrl = debugMode
       ? 'http://localhost/attendace/backend' // Note: Use 10.0.2.2 for Android Emulator
@@ -47,8 +47,9 @@ class ApiService extends GetConnect {
       if (response.bodyString != null && response.bodyString!.isNotEmpty) {
         try {
           final decoded = jsonDecode(response.bodyString!);
-          if (decoded is Map && decoded.containsKey('message')) {
-            return {"status": "error", "message": decoded['message']};
+          if (decoded is Map) {
+            decoded['status'] = 'error';
+            return decoded;
           }
         } catch (_) {}
       }

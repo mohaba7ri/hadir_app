@@ -275,6 +275,8 @@ class SettingsModel {
   int lastRenewalYear;
   int minVersion;
   String? forceUpdateUrl;
+  bool autoMonthlyPayrollEnabled;
+  String? lastAutoClosingMonth;
 
   SettingsModel({
     required this.defaultStartTime,
@@ -286,6 +288,8 @@ class SettingsModel {
     required this.lastRenewalYear,
     this.minVersion = 1,
     this.forceUpdateUrl,
+    this.autoMonthlyPayrollEnabled = false,
+    this.lastAutoClosingMonth,
   });
 
   factory SettingsModel.fromJson(Map<String, dynamic> json) {
@@ -307,6 +311,10 @@ class SettingsModel {
           ? int.tryParse(json['min_version'].toString()) ?? 1
           : 1,
       forceUpdateUrl: json['force_update_url'],
+      autoMonthlyPayrollEnabled: json['auto_monthly_payroll_enabled'] == "1" ||
+          json['auto_monthly_payroll_enabled'] == 1 ||
+          json['auto_monthly_payroll_enabled'] == true,
+      lastAutoClosingMonth: json['last_auto_closing_month'],
     );
   }
 
@@ -321,6 +329,8 @@ class SettingsModel {
       'last_renewal_year': lastRenewalYear,
       'min_version': minVersion,
       'force_update_url': forceUpdateUrl,
+      'auto_monthly_payroll_enabled': autoMonthlyPayrollEnabled ? 1 : 0,
+      'last_auto_closing_month': lastAutoClosingMonth,
     };
   }
 }

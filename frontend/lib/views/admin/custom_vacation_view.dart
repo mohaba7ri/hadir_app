@@ -118,8 +118,8 @@ class _CustomVacationViewState extends State<CustomVacationView> {
           style: ElevatedButton.styleFrom(
             backgroundColor: AppTheme.primaryTeal,
             foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             elevation: 0,
           ),
           child: const Text('تأكيد الإسناد'),
@@ -140,10 +140,12 @@ class _CustomVacationViewState extends State<CustomVacationView> {
       PopScope(
         canPop: false,
         child: Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
           elevation: 0,
           backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          insetPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 400),
             child: Container(
@@ -185,10 +187,11 @@ class _CustomVacationViewState extends State<CustomVacationView> {
                           fontWeight: FontWeight.bold,
                           color: AppTheme.textPrimary)),
                   const SizedBox(height: 8),
-                  Obx(() => Text('تم معالجة ${currentProgress.value} من $total موظف',
+                  Obx(() => Text(
+                      'تم معالجة ${currentProgress.value} من $total موظف',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          fontSize: Responsive.isMobile(context) ? 13 : 14, 
+                          fontSize: Responsive.isMobile(context) ? 13 : 14,
                           color: AppTheme.textSecondary))),
                   SizedBox(height: Responsive.isMobile(context) ? 16 : 24),
                   Obx(() => ClipRRect(
@@ -224,7 +227,8 @@ class _CustomVacationViewState extends State<CustomVacationView> {
           totalCreditDays < totalDays) {
         // Skip silently, it's better UX than showing 50 stacked error dialogs
         failCount++;
-        failedDetails.add('• ${emp.name}: رصيد الإجازات السنوية غير كافٍ (المتاح: ${UiUtils.formatDaysApproximate(totalCreditDays)})');
+        failedDetails.add(
+            '• ${emp.name}: رصيد الإجازات السنوية غير كافٍ (المتاح: ${UiUtils.formatDaysApproximate(totalCreditDays)})');
         currentProgress.value++;
         continue;
       }
@@ -240,17 +244,20 @@ class _CustomVacationViewState extends State<CustomVacationView> {
         employeeName: emp.name,
       );
 
-      dynamic errorReason = await controller.addVacationRequestWithReason(request,
+      dynamic errorReason = await controller.addVacationRequestWithReason(
+          request,
           attachmentFile: _attachmentFile.value);
-      
+
       if (errorReason == null) {
         successCount++;
       } else {
         failCount++;
-        String msg = errorReason is Map ? (errorReason['message']?.toString() ?? 'خطأ') : errorReason.toString();
+        String msg = errorReason is Map
+            ? (errorReason['message']?.toString() ?? 'خطأ')
+            : errorReason.toString();
         failedDetails.add('• ${emp.name}: $msg');
       }
-        
+
       currentProgress.value++;
     }
 
@@ -262,12 +269,16 @@ class _CustomVacationViewState extends State<CustomVacationView> {
     if (successCount > 0) {
       String msg = 'تمت إضافة الإجازة لـ $successCount موظف بنجاح.';
       if (failCount > 0) {
-        msg += '\n\nملاحظة: تعذر الإسناد لـ $failCount موظفين للأسباب التالية:\n' + failedDetails.join('\n');
+        msg +=
+            '\n\nملاحظة: تعذر الإسناد لـ $failCount موظفين للأسباب التالية:\n' +
+                failedDetails.join('\n');
       }
       UiUtils.showSuccessDialog('اكتملت العملية', msg);
     } else if (failCount > 0) {
       UiUtils.showErrorDialog(
-          'فشل العملية', 'تعذر إضافة الإجازة لـ $failCount موظفين للأسباب التالية:\n\n' + failedDetails.join('\n'));
+          'فشل العملية',
+          'تعذر إضافة الإجازة لـ $failCount موظفين للأسباب التالية:\n\n' +
+              failedDetails.join('\n'));
     }
 
     if (successCount > 0) {
@@ -598,10 +609,9 @@ class _CustomVacationViewState extends State<CustomVacationView> {
                   return Obx(() {
                     final isSelected = _selectedEmployeeIds.contains(emp.id);
                     return CheckboxListTile(
-                      title:
-                          Text(emp.name, style: TextStyle(fontSize: 14)),
-                      subtitle: Text('ID: ${emp.id}',
-                          style: TextStyle(fontSize: 11)),
+                      title: Text(emp.name, style: TextStyle(fontSize: 14)),
+                      subtitle:
+                          Text('ID: ${emp.id}', style: TextStyle(fontSize: 11)),
                       value: isSelected,
                       onChanged: (_) => _toggleEmployee(emp.id!),
                       activeColor: AppTheme.primaryTeal,

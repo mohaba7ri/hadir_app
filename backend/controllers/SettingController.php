@@ -27,6 +27,9 @@ class SettingController {
                 $this->setting->last_renewal_year = $data->last_renewal_year ?? 2026;
                 $this->setting->min_version = $data->min_version ?? 1;
                 $this->setting->force_update_url = $data->force_update_url ?? null;
+                $currentSettings = $this->setting->getSettings();
+                $this->setting->auto_monthly_payroll_enabled = isset($data->auto_monthly_payroll_enabled) ? ($data->auto_monthly_payroll_enabled ? 1 : 0) : ($currentSettings['auto_monthly_payroll_enabled'] ?? 0);
+                $this->setting->last_auto_closing_month = $data->last_auto_closing_month ?? ($currentSettings['last_auto_closing_month'] ?? null);
 
                 if ($this->setting->update()) {
                     http_response_code(200);

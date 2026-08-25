@@ -258,28 +258,52 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
 
   int _getRemainingMonthlyLimit(EmployeeModel emp, int selectedMonth, int selectedYear) {
     int monthlyLimit = emp.monthlyAnnualLeaveLimitMinutes;
-    
-    int startMonth = selectedMonth == 1 ? 12 : selectedMonth - 1;
-    int startYear = selectedMonth == 1 ? selectedYear - 1 : selectedYear;
-    
-    DateTime cycleStart = DateTime(startYear, startMonth, 25);
-    DateTime cycleEnd = DateTime(selectedYear, selectedMonth, 24, 23, 59, 59);
-    
-    int usedMinutes = controller.vacationRequests.where((v) {
-      if (v.employeeId != emp.id) return false;
-      if (v.vacationType != AppConstants.annualLeave) return false;
-      if (v.status != 'pending' && v.status != 'approved') return false;
-      
-      try {
-        final reqStart = DateTime.parse(v.startDate);
-        return (reqStart.isAfter(cycleStart) || reqStart.isAtSameMomentAs(cycleStart)) && 
-               (reqStart.isBefore(cycleEnd) || reqStart.isAtSameMomentAs(cycleEnd));
-      } catch (_) {
-        return false;
-      }
-    }).fold(0, (sum, v) => sum + v.totalMinutes);
 
-    return monthlyLimit - usedMinutes;
+    int baselineYear = 2026;
+    int baselineMonth = 8;
+    DateTime baselineCycleStart = DateTime(2026, 7, 25);
+
+    if (selectedYear < baselineYear || (selectedYear == baselineYear && selectedMonth < baselineMonth)) {
+      int startMonth = selectedMonth == 1 ? 12 : selectedMonth - 1;
+      int startYear = selectedMonth == 1 ? selectedYear - 1 : selectedYear;
+      
+      DateTime cycleStart = DateTime(startYear, startMonth, 25);
+      DateTime cycleEnd = DateTime(selectedYear, selectedMonth, 24, 23, 59, 59);
+      
+      int usedMinutes = controller.vacationRequests.where((v) {
+        if (v.employeeId != emp.id) return false;
+        if (v.vacationType != AppConstants.annualLeave) return false;
+        if (v.status != 'pending' && v.status != 'approved') return false;
+        
+        try {
+          final reqStart = DateTime.parse(v.startDate);
+          return (reqStart.isAfter(cycleStart) || reqStart.isAtSameMomentAs(cycleStart)) && 
+                 (reqStart.isBefore(cycleEnd) || reqStart.isAtSameMomentAs(cycleEnd));
+        } catch (_) {
+          return false;
+        }
+      }).fold(0, (sum, v) => sum + v.totalMinutes);
+
+      return monthlyLimit - usedMinutes;
+    } else {
+      int monthsElapsed = (selectedYear - baselineYear) * 12 + (selectedMonth - baselineMonth) + 1;
+      int effectiveLimit = monthsElapsed * monthlyLimit;
+
+      int usedMinutes = controller.vacationRequests.where((v) {
+        if (v.employeeId != emp.id) return false;
+        if (v.vacationType != AppConstants.annualLeave) return false;
+        if (v.status != 'pending' && v.status != 'approved') return false;
+        
+        try {
+          final reqStart = DateTime.parse(v.startDate);
+          return reqStart.isAfter(baselineCycleStart) || reqStart.isAtSameMomentAs(baselineCycleStart);
+        } catch (_) {
+          return false;
+        }
+      }).fold(0, (sum, v) => sum + v.totalMinutes);
+
+      return effectiveLimit - usedMinutes;
+    }
   }
 
   Widget _buildHeader(
@@ -657,12 +681,36 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                             !hasVacation &&
                             !isHoliday) ...[
                           SizedBox(height: 4),
-                          Text(
-                              'خصم غياب (-${((att.salary > 0 ? att.salary : employee.salary) / controller.daysInMonth).toStringAsFixed(2)} ر.س)',
-                              style: TextStyle(
-                                  fontSize: 11,
-                                  color: AppTheme.errorRed,
-                                  fontWeight: FontWeight.bold)),
+                          Builder(builder: (context) {
+                            final hourlyVac = controller.getHourlyVacationRequest(
+                                employee.id ?? 0, att.date);
+                            double baseAbsenceDisc = 0.0;
+                            if (hourlyVac != null) {
+                              baseAbsenceDisc = (att.discount - att.lateDiscount - att.earlyExitDiscount);
+                              if (baseAbsenceDisc < 0) baseAbsenceDisc = 0.0;
+                            } else {
+                              baseAbsenceDisc = att.discount > 0
+                                  ? (att.discount - att.lateDiscount - att.earlyExitDiscount)
+                                  : ((att.salary > 0 ? att.salary : employee.salary) / controller.daysInMonth);
+                            }
+
+                            if (baseAbsenceDisc <= 0 && hourlyVac != null) {
+                              return Text(
+                                'خصم غياب (0.00 ر.س - مغطى بالكامل كإجازة)',
+                                style: TextStyle(
+                                    fontSize: 11,
+                                    color: AppTheme.successGreen,
+                                    fontWeight: FontWeight.bold),
+                              );
+                            }
+
+                            return Text(
+                                'خصم غياب (-${baseAbsenceDisc.toStringAsFixed(2)} ر.س)${hourlyVac != null && hourlyVac.status == 'approved' ? " (مغطى جزئياً)" : ""}',
+                                style: TextStyle(
+                                    fontSize: 11,
+                                    color: AppTheme.errorRed,
+                                    fontWeight: FontWeight.bold));
+                          }),
                         ],
                         if (controller.correctionRequests.any((c) =>
                             c.date == att.date &&
@@ -840,10 +888,15 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
     final hourlyVac =
         controller.getHourlyVacationRequest(employee.id ?? 0, att.date);
     if (hourlyVac != null) {
+      String statusLabel = hourlyVac.status == 'approved' ? 'معتمدة' : 'قيد الانتظار';
       String hourlyText =
-          'تم طلب (${hourlyVac.totalMinutes}د) من (${hourlyVac.vacationType})';
+          'إجازة (${hourlyVac.totalMinutes}د) $statusLabel';
       if (statusText.isNotEmpty && statusText != 'حاضر') {
-        statusText += ' | $hourlyText';
+        if (hourlyVac.status == 'approved' && att.status == 'absent') {
+          statusText = 'غائب (مغطى جزئياً) | $hourlyText';
+        } else {
+          statusText += ' | $hourlyText';
+        }
       } else {
         statusText = hourlyText;
       }
@@ -910,25 +963,60 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
             ),
             if (att.status == 'absent' && !hasVacation && !isHoliday) ...[
               SizedBox(height: 3),
-              Row(
-                children: [
-                  Icon(Icons.money_off_csred_rounded,
-                      size: 14, color: AppTheme.errorRed),
-                  SizedBox(width: 4),
-                  const Text('خصم غياب',
-                      style: TextStyle(
-                          fontSize: 11,
-                          color: AppTheme.errorRed,
-                          fontWeight: FontWeight.bold)),
-                  const Spacer(),
-                  Text(
-                      '- ${(employee.salary / controller.daysInMonth).toStringAsFixed(2)} ر.س',
-                      style: TextStyle(
-                          fontSize: 11,
-                          color: AppTheme.errorRed,
-                          fontWeight: FontWeight.bold)),
-                ],
-              ),
+              Builder(builder: (context) {
+                final hourlyVac = controller.getHourlyVacationRequest(
+                    employee.id ?? 0, att.date);
+                double baseAbsenceDisc = 0.0;
+                if (hourlyVac != null) {
+                  baseAbsenceDisc = (att.discount - att.lateDiscount - att.earlyExitDiscount);
+                  if (baseAbsenceDisc < 0) baseAbsenceDisc = 0.0;
+                } else {
+                  baseAbsenceDisc = att.discount > 0
+                      ? (att.discount - att.lateDiscount - att.earlyExitDiscount)
+                      : ((att.salary > 0 ? att.salary : employee.salary) / controller.daysInMonth);
+                }
+
+                if (baseAbsenceDisc <= 0 && hourlyVac != null) {
+                  return Row(
+                    children: [
+                      const Icon(Icons.check_circle_outline_rounded,
+                          size: 14, color: AppTheme.successGreen),
+                      const SizedBox(width: 4),
+                      const Text('خصم غياب (مغطى بالكامل كإجازة)',
+                          style: TextStyle(
+                              fontSize: 11,
+                              color: AppTheme.successGreen,
+                              fontWeight: FontWeight.bold)),
+                      const Spacer(),
+                      const Text('0.00 ر.س',
+                          style: TextStyle(
+                              fontSize: 11,
+                              color: AppTheme.successGreen,
+                              fontWeight: FontWeight.bold)),
+                    ],
+                  );
+                }
+
+                return Row(
+                  children: [
+                    const Icon(Icons.money_off_csred_rounded,
+                        size: 14, color: AppTheme.errorRed),
+                    const SizedBox(width: 4),
+                    Text(
+                        'خصم غياب${hourlyVac != null && hourlyVac.status == 'approved' ? " (مغطى جزئياً)" : ""}',
+                        style: const TextStyle(
+                            fontSize: 11,
+                            color: AppTheme.errorRed,
+                            fontWeight: FontWeight.bold)),
+                    const Spacer(),
+                    Text('- ${baseAbsenceDisc.toStringAsFixed(2)} ر.س',
+                        style: const TextStyle(
+                            fontSize: 11,
+                            color: AppTheme.errorRed,
+                            fontWeight: FontWeight.bold)),
+                  ],
+                );
+              }),
               Row(
                 children: [
                   Icon(Icons.touch_app_rounded,
@@ -1076,7 +1164,70 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
               children: [
                 Text('التاريخ: ${att.date}',
                     style: TextStyle(fontWeight: FontWeight.bold)),
-                SizedBox(height: 20),
+                SizedBox(height: 12),
+                Builder(builder: (context) {
+                  final existingVac = controller.getApprovedVacation(att.employeeId, att.date) ?? controller.getHourlyVacationRequest(att.employeeId, att.date);
+                  if (existingVac == null) return const SizedBox.shrink();
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.errorRed.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppTheme.errorRed.withValues(alpha: 0.3)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.info_outline_rounded, color: AppTheme.errorRed, size: 18),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'توجد إجازة سابقة لهذا اليوم (${existingVac.totalMinutes > 0 ? "${existingVac.totalMinutes} دقيقة" : "يوم كامل"}) - ${existingVac.vacationType}',
+                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.errorRed),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Get.back();
+                              UiUtils.showConfirmDialog(
+                                title: 'تأكيد الحذف',
+                                message: 'هل أنت متأكد من حذف وإلغاء هذه الإجازة؟',
+                                confirmColor: AppTheme.errorRed,
+                                confirmText: 'حذف الإجازة',
+                                onConfirm: () async {
+                                  final res = await controller.deleteVacation(existingVac.id!, employeeId: att.employeeId);
+                                  if (res == null) {
+                                    UiUtils.showSuccessDialog('تم الحذف', 'تم حذف الإجازة وإلغاء التغطية بنجاح.');
+                                    controller.fetchEmployeeMonthlySummary(att.employeeId);
+                                  } else {
+                                    UiUtils.showErrorDialog('تعذر الحذف', res);
+                                  }
+                                },
+                              );
+                            },
+                            icon: const Icon(Icons.delete_outline_rounded, size: 16),
+                            label: const Text('حذف وإلغاء الإجازة الحالية', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.errorRed,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
                 const Text('اختر نوع الإجازة:', style: TextStyle(fontSize: 13)),
                 SizedBox(height: 12),
                 Obx(() {
@@ -1227,30 +1378,35 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                               controller
                                   .fetchEmployeeMonthlySummary(att.employeeId);
                             } else {
-                              if (errorMsg is Map && errorMsg['error_type'] == 'limit_exceeded_with_remaining' && errorMsg['remaining_minutes'] != null && errorMsg['remaining_minutes'] > 0) {
-                                int remaining = errorMsg['remaining_minutes'];
-                                Get.defaultDialog(
-                                  title: 'تجاوز الحد المسموح',
-                                  middleText: '${errorMsg['message']}\n\nهل تود عمل طلب إجازة بالوقت المتبقي فقط؟',
-                                  textConfirm: 'نعم',
-                                  textCancel: 'لا',
-                                  confirmTextColor: Colors.white,
-                                  onConfirm: () async {
-                                    Get.back();
-                                    request.totalMinutes = remaining;
-                                    request.isHourly = true;
-                                    request.totalDays = 0;
-                                    final retryRes = await controller.addVacationRequestWithReason(request, attachmentFile: selectedAttachmentFile.value);
-                                    if (retryRes == null) {
-                                        Get.back();
-                                        UiUtils.showSuccessDialog('تم بنجاح', 'تم تحويل يوم الغياب إلى ${selectedType.value} بالوقت المتبقي');
-                                        controller.fetchEmployeeMonthlySummary(att.employeeId);
-                                    } else {
-                                        String msg = retryRes is Map ? (retryRes['message']?.toString() ?? 'خطأ') : retryRes.toString();
-                                        UiUtils.showErrorDialog('تعذر حفظ الإجازة', msg);
+                              if (errorMsg is Map && errorMsg['error_type'] == 'limit_exceeded_with_remaining' && errorMsg['remaining_minutes'] != null) {
+                                int remaining = int.tryParse(errorMsg['remaining_minutes'].toString()) ?? 0;
+                                if (remaining > 0) {
+                                  Get.defaultDialog(
+                                    title: 'تجاوز الحد المسموح',
+                                    middleText: '${errorMsg['message']}\n\nهل تود عمل طلب إجازة بالوقت المتبقي فقط؟',
+                                    textConfirm: 'نعم',
+                                    textCancel: 'لا',
+                                    confirmTextColor: Colors.white,
+                                    onConfirm: () async {
+                                      Get.back();
+                                      request.totalMinutes = remaining;
+                                      request.isHourly = true;
+                                      request.totalDays = 0;
+                                      final retryRes = await controller.addVacationRequestWithReason(request, attachmentFile: selectedAttachmentFile.value);
+                                      if (retryRes == null) {
+                                          Get.back();
+                                          UiUtils.showSuccessDialog('تم بنجاح', 'تم تحويل يوم الغياب إلى ${selectedType.value} بالوقت المتبقي');
+                                          controller.fetchEmployeeMonthlySummary(att.employeeId);
+                                      } else {
+                                          String msg = retryRes is Map ? (retryRes['message']?.toString() ?? 'خطأ') : retryRes.toString();
+                                          UiUtils.showErrorDialog('تعذر حفظ الإجازة', msg);
+                                      }
                                     }
-                                  }
-                                );
+                                  );
+                                } else {
+                                  String msg = errorMsg['message']?.toString() ?? 'خطأ';
+                                  UiUtils.showErrorDialog('تعذر حفظ الإجازة', msg);
+                                }
                               } else {
                                 String msg = errorMsg is Map ? (errorMsg['message']?.toString() ?? 'خطأ') : errorMsg.toString();
                                 UiUtils.showErrorDialog('تعذر حفظ الإجازة', msg);
@@ -1740,7 +1896,67 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                                     controller.fetchEmployeeMonthlySummary(
                                         att.employeeId);
                                   } else {
-                                    UiUtils.showErrorDialog('خطأ', errorMsg);
+                                    if (errorMsg is Map &&
+                                        errorMsg['error_type'] ==
+                                            'limit_exceeded_with_remaining' &&
+                                        errorMsg['remaining_minutes'] != null) {
+                                      int remaining = int.tryParse(
+                                              errorMsg['remaining_minutes']
+                                                  .toString()) ??
+                                          0;
+                                      if (remaining > 0) {
+                                        Get.defaultDialog(
+                                          title: 'تجاوز الحد المسموح',
+                                          middleText:
+                                              '${errorMsg['message']}\n\nهل تود عمل طلب إجازة بالوقت المتبقي فقط؟',
+                                          textConfirm: 'نعم',
+                                          textCancel: 'لا',
+                                          confirmTextColor: Colors.white,
+                                          onConfirm: () async {
+                                            Get.back();
+                                            request.totalMinutes = remaining;
+                                            request.isHourly = true;
+                                            request.totalDays = 0;
+                                            final retryRes = await controller
+                                                .addVacationRequestWithReason(
+                                                    request,
+                                                    attachmentFile:
+                                                        selectedAttachmentFile
+                                                            .value);
+                                            if (retryRes == null) {
+                                              Get.back();
+                                              UiUtils.showSuccessDialog(
+                                                  'تم التغطية بنجاح',
+                                                  'تم تطبيق الإجازة واحتساب الدقائق المتبقية فقط.');
+                                              controller
+                                                  .fetchEmployeeMonthlySummary(
+                                                      att.employeeId);
+                                            } else {
+                                              String msg = retryRes is Map
+                                                  ? (retryRes['message']
+                                                          ?.toString() ??
+                                                      'خطأ')
+                                                  : retryRes.toString();
+                                              UiUtils.showErrorDialog(
+                                                  'تعذر حفظ التغطية', msg);
+                                            }
+                                          },
+                                        );
+                                      } else {
+                                        String msg =
+                                            errorMsg['message']?.toString() ??
+                                                'خطأ';
+                                        UiUtils.showErrorDialog(
+                                            'تعذر حفظ التغطية', msg);
+                                      }
+                                    } else {
+                                      String msg = errorMsg is Map
+                                          ? (errorMsg['message']?.toString() ??
+                                              'خطأ')
+                                          : errorMsg.toString();
+                                      UiUtils.showErrorDialog(
+                                          'تعذر حفظ التغطية', msg);
+                                    }
                                   }
                                 },
                           style: ElevatedButton.styleFrom(
@@ -2096,11 +2312,19 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                             att.salary, employee);
                         final lateDisc = effectiveLate * minuteRate;
                         final earlyDisc = earlyMins * minuteRate;
-                        final absenceDisc = (effectiveStatus == 'absent' &&
-                                !controller.hasApprovedVacation(
-                                    att.employeeId, att.date))
-                            ? (att.salary / controller.daysInMonth)
-                            : 0.0;
+                        final hourlyVac = controller.getHourlyVacationRequest(
+                            att.employeeId, att.date);
+                        double absenceDisc = 0.0;
+                        if (effectiveStatus == 'absent') {
+                          if (hourlyVac != null) {
+                            absenceDisc = (att.discount - att.lateDiscount - att.earlyExitDiscount);
+                            if (absenceDisc < 0) absenceDisc = 0.0;
+                          } else if (!controller.hasApprovedVacation(att.employeeId, att.date)) {
+                            absenceDisc = att.discount > 0
+                                ? (att.discount - att.lateDiscount - att.earlyExitDiscount)
+                                : ((att.salary > 0 ? att.salary : employee.salary) / controller.daysInMonth);
+                          }
+                        }
                         final totalDisc = lateDisc + earlyDisc + absenceDisc;
 
                         return Container(
@@ -2581,42 +2805,46 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                       ),
                       SizedBox(height: 8),
                     ],
-                    if (hasVacation && vacation != null) ...[
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            Get.back();
-                            UiUtils.showConfirmDialog(
-                              title: 'تأكيد الحذف',
-                              message: 'هل أنت متأكد من حذف هذه الإجازة؟',
-                              confirmColor: AppTheme.errorRed,
-                              confirmText: 'حذف',
-                              onConfirm: () async {
-                                final res = await controller.deleteVacation(vacation.id!);
-                                if (res == null) {
-                                  UiUtils.showSuccessDialog('تم الحذف', 'تم حذف الإجازة بنجاح.');
-                                  controller.fetchEmployeeMonthlySummary(employee.id!);
-                                } else {
-                                  UiUtils.showErrorDialog('تعذر الحذف', res);
+                    Builder(builder: (context) {
+                      final targetVacation = vacation ?? controller.getHourlyVacationRequest(employee.id ?? 0, att.date);
+                      if (targetVacation == null) return const SizedBox.shrink();
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Get.back();
+                              UiUtils.showConfirmDialog(
+                                title: 'تأكيد الحذف',
+                                message: 'هل أنت متأكد من حذف وإلغاء هذه الإجازة (${targetVacation.totalMinutes > 0 ? "${targetVacation.totalMinutes}د" : "يوم كامل"})؟',
+                                confirmColor: AppTheme.errorRed,
+                                confirmText: 'حذف الإجازة',
+                                onConfirm: () async {
+                                  final res = await controller.deleteVacation(targetVacation.id!, employeeId: employee.id!);
+                                  if (res == null) {
+                                    UiUtils.showSuccessDialog('تم الحذف', 'تم حذف الإجازة وإلغاء التغطية بنجاح.');
+                                    controller.fetchEmployeeMonthlySummary(employee.id!);
+                                  } else {
+                                    UiUtils.showErrorDialog('تعذر الحذف', res);
+                                  }
                                 }
-                              }
-                            );
-                          },
-                          icon: const Icon(Icons.delete_outline_rounded, size: 18),
-                          label: const Text('إلغاء وحذف الإجازة',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.errorRed,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12)),
-                              elevation: 0),
+                              );
+                            },
+                            icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                            label: const Text('إلغاء وحذف الإجازة',
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.errorRed,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
+                                elevation: 0),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                    ],
+                      );
+                    }),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(

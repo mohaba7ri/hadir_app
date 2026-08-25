@@ -8,7 +8,9 @@ CREATE TABLE IF NOT EXISTS atk_settings (
     default_end_time TIME DEFAULT '16:00:00',
     last_renewal_year INT DEFAULT 2026,
     min_version INT DEFAULT 1,
-    force_update_url VARCHAR(500) NULL
+    force_update_url VARCHAR(500) NULL,
+    auto_monthly_payroll_enabled TINYINT(1) DEFAULT 0,
+    last_auto_closing_month VARCHAR(7) NULL
 );
 
 INSERT INTO atk_settings (default_start_time, allowed_late_minutes, ramadan_start_time, ramadan_end_time, ramadan_mode, default_end_time)

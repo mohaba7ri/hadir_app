@@ -252,25 +252,57 @@ class MyVacationsView extends StatelessWidget {
     int getMonthlyRemainingBalance(DateTime requestMonth) {
       final int monthlyLimit =
           controller.employeeData.value?.monthlyAnnualLeaveLimitMinutes ?? 750;
-          
-      int startMonth = requestMonth.month == 1 ? 12 : requestMonth.month - 1;
-      int startYear = requestMonth.month == 1 ? requestMonth.year - 1 : requestMonth.year;
-      
-      DateTime cycleStart = DateTime(startYear, startMonth, 25);
-      DateTime cycleEnd = DateTime(requestMonth.year, requestMonth.month, 24, 23, 59, 59);
-          
-      final int usedMinutesThisMonth = controller.myVacationRequests.where((v) {
-        if (v.vacationType != AppConstants.annualLeave) return false;
-        if (v.status != 'pending' && v.status != 'approved') return false;
-        try {
-          final reqStart = DateTime.parse(v.startDate);
-          return (reqStart.isAfter(cycleStart) || reqStart.isAtSameMomentAs(cycleStart)) && 
-                 (reqStart.isBefore(cycleEnd) || reqStart.isAtSameMomentAs(cycleEnd));
-        } catch (_) {
-          return false;
+
+      int reqMonth = requestMonth.month;
+      int reqYear = requestMonth.year;
+      if (requestMonth.day >= 25) {
+        reqMonth++;
+        if (reqMonth > 12) {
+          reqMonth = 1;
+          reqYear++;
         }
-      }).fold(0, (sum, v) => sum + v.totalMinutes);
-      return monthlyLimit - usedMinutesThisMonth;
+      }
+
+      int baselineYear = 2026;
+      int baselineMonth = 8;
+      DateTime baselineCycleStart = DateTime(2026, 7, 25);
+
+      if (reqYear < baselineYear || (reqYear == baselineYear && reqMonth < baselineMonth)) {
+        int startMonth = reqMonth == 1 ? 12 : reqMonth - 1;
+        int startYear = reqMonth == 1 ? reqYear - 1 : reqYear;
+        DateTime cycleStart = DateTime(startYear, startMonth, 25);
+        DateTime cycleEnd = DateTime(reqYear, reqMonth, 24, 23, 59, 59);
+
+        final int usedMinutesThisMonth = controller.myVacationRequests.where((v) {
+          if (v.vacationType != AppConstants.annualLeave) return false;
+          if (v.status != 'pending' && v.status != 'approved') return false;
+          try {
+            final reqStart = DateTime.parse(v.startDate);
+            return (reqStart.isAfter(cycleStart) || reqStart.isAtSameMomentAs(cycleStart)) && 
+                   (reqStart.isBefore(cycleEnd) || reqStart.isAtSameMomentAs(cycleEnd));
+          } catch (_) {
+            return false;
+          }
+        }).fold(0, (sum, v) => sum + v.totalMinutes);
+
+        return monthlyLimit - usedMinutesThisMonth;
+      } else {
+        int monthsElapsed = (reqYear - baselineYear) * 12 + (reqMonth - baselineMonth) + 1;
+        int effectiveLimit = monthsElapsed * monthlyLimit;
+
+        final int usedMinutesCumulative = controller.myVacationRequests.where((v) {
+          if (v.vacationType != AppConstants.annualLeave) return false;
+          if (v.status != 'pending' && v.status != 'approved') return false;
+          try {
+            final reqStart = DateTime.parse(v.startDate);
+            return reqStart.isAfter(baselineCycleStart) || reqStart.isAtSameMomentAs(baselineCycleStart);
+          } catch (_) {
+            return false;
+          }
+        }).fold(0, (sum, v) => sum + v.totalMinutes);
+
+        return effectiveLimit - usedMinutesCumulative;
+      }
     }
 
     String formatMinutes(int total) {
@@ -278,7 +310,7 @@ class MyVacationsView extends StatelessWidget {
       int m = total % 60;
       if (h == 0) return '$m دقيقة';
       if (m == 0) return '$h ساعة';
-      return '$h س $m د';
+      return '$h ساعة و $m دقيقة';
     }
 
     void calculateTotal() {

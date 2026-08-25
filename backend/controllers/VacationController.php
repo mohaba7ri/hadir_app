@@ -37,6 +37,41 @@ class VacationController
         }
     }
 
+    private function formatMinutesToText($totalMinutes)
+    {
+        $totalMinutes = (int)$totalMinutes;
+        if ($totalMinutes <= 0) {
+            return "0 دقيقة";
+        }
+        $hours = floor($totalMinutes / 60);
+        $minutes = $totalMinutes % 60;
+
+        $parts = [];
+        if ($hours > 0) {
+            if ($hours == 1) {
+                $parts[] = "ساعة واحدة";
+            } elseif ($hours == 2) {
+                $parts[] = "ساعتان";
+            } elseif ($hours >= 3 && $hours <= 10) {
+                $parts[] = "$hours ساعات";
+            } else {
+                $parts[] = "$hours ساعة";
+            }
+        }
+        if ($minutes > 0) {
+            if ($minutes == 1) {
+                $parts[] = "دقيقة واحدة";
+            } elseif ($minutes == 2) {
+                $parts[] = "دقيقتان";
+            } elseif ($minutes >= 3 && $minutes <= 10) {
+                $parts[] = "$minutes دقائق";
+            } else {
+                $parts[] = "$minutes دقيقة";
+            }
+        }
+        return implode(" و ", $parts);
+    }
+
     public function processRequest($method, $id)
     {
         switch ($method) {
@@ -140,30 +175,49 @@ class VacationController
                                 }
                             }
 
-                            if ($month == 1) {
-                                $start_month = 12;
-                                $start_year = $year - 1;
+                            // Baseline for cumulative roll-over is Month 8 of 2026 (Cycle start: 2026-07-25)
+                            $baselineYear = 2026;
+                            $baselineMonth = 8;
+                            $baselineCycleStart = "2026-07-25";
+
+                            if ($year < $baselineYear || ($year == $baselineYear && $month < $baselineMonth)) {
+                                // Prior to Month 8 of 2026: Standard single-month limit check
+                                if ($month == 1) {
+                                    $start_month = 12;
+                                    $start_year = $year - 1;
+                                } else {
+                                    $start_month = $month - 1;
+                                    $start_year = $year;
+                                }
+                                $cycle_start = sprintf('%04d-%02d-25', $start_year, $start_month);
+                                $cycle_end = sprintf('%04d-%02d-24', $year, $month);
+
+                                $sumStmt = $this->db->prepare("SELECT SUM(total_minutes) as used_minutes FROM atk_vacations WHERE employee_id = ? AND vacation_type = 'إجازة سنوية' AND start_date >= ? AND start_date <= ? AND status != 'rejected'");
+                                $sumStmt->execute([$employee_id, $cycle_start, $cycle_end]);
+                                $sumRow = $sumStmt->fetch(PDO::FETCH_ASSOC);
+                                $usedMinutes = $sumRow ? (int) ($sumRow['used_minutes'] ?? 0) : 0;
+                                $effectiveLimit = $monthlyLimit;
                             } else {
-                                $start_month = $month - 1;
-                                $start_year = $year;
+                                // Month 8 of 2026 onwards: Cumulative roll-over accrual
+                                $monthsElapsed = ($year - $baselineYear) * 12 + ($month - $baselineMonth) + 1;
+                                $effectiveLimit = $monthsElapsed * $monthlyLimit;
+
+                                $sumStmt = $this->db->prepare("SELECT SUM(total_minutes) as used_minutes FROM atk_vacations WHERE employee_id = ? AND vacation_type = 'إجازة سنوية' AND start_date >= ? AND status != 'rejected'");
+                                $sumStmt->execute([$employee_id, $baselineCycleStart]);
+                                $sumRow = $sumStmt->fetch(PDO::FETCH_ASSOC);
+                                $usedMinutes = $sumRow ? (int) ($sumRow['used_minutes'] ?? 0) : 0;
                             }
-                            $cycle_start = sprintf('%04d-%02d-25', $start_year, $start_month);
-                            $cycle_end = sprintf('%04d-%02d-24', $year, $month);
 
-                            $sumStmt = $this->db->prepare("SELECT SUM(total_minutes) as used_minutes FROM atk_vacations WHERE employee_id = ? AND vacation_type = 'إجازة سنوية' AND start_date >= ? AND start_date <= ? AND status != 'rejected'");
-                            $sumStmt->execute([$employee_id, $cycle_start, $cycle_end]);
-                            $sumRow = $sumStmt->fetch(PDO::FETCH_ASSOC);
-                            $usedMinutes = $sumRow ? (int) ($sumRow['used_minutes'] ?? 0) : 0;
-
-                            if (($usedMinutes + $total_minutes) > $monthlyLimit) {
-                                $remaining = max(0, $monthlyLimit - $usedMinutes);
-                                $remText = $remaining > 0 ? "يتبقى لك " . number_format($remaining / 60, 2) . " ساعة فقط." : "لقد استنفدت الحد المسموح.";
+                            if (($usedMinutes + $total_minutes) > $effectiveLimit) {
+                                $remaining = max(0, $effectiveLimit - $usedMinutes);
+                                $remText = $remaining > 0 ? "يتبقى لك " . $this->formatMinutesToText($remaining) . " فقط." : "لقد استنفدت الحد المسموح التراكمي.";
+                                $limitText = $this->formatMinutesToText($effectiveLimit);
                                 http_response_code(400);
                                 echo json_encode([
                                     "status" => "error", 
                                     "error_type" => "limit_exceeded_with_remaining",
                                     "remaining_minutes" => $remaining,
-                                    "message" => "لقد تجاوزت الحد الشهري للإجازة السنوية (" . number_format($monthlyLimit / 60, 2) . " ساعة). $remText"
+                                    "message" => "لقد تجاوزت رصيد الإجازة السنوية التراكمي المتاح ($limitText). $remText"
                                 ]);
                                 break;
                             }

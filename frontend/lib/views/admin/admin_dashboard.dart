@@ -71,22 +71,32 @@ class _AdminDashboardState extends State<AdminDashboard> {
           children: [
             Icon(Icons.event_available_rounded, color: AppTheme.primaryTeal),
             SizedBox(width: 8),
-            const Text('إغلاق شهري لسجلات الحضور', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('إغلاق شهري لسجلات الحضور',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ],
         ),
-        content: const Text('اليوم هو 24 من الشهر. هل ترغب في إجراء إغلاق شهري لسجلات الحضور للموظفين؟', style: TextStyle(fontSize: 14)),
+        content: const Text(
+            'اليوم هو 24 من الشهر. هل ترغب في إجراء إغلاق شهري لسجلات الحضور للموظفين؟',
+            style: TextStyle(fontSize: 14)),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('لاحقاً', style: TextStyle(color: AppTheme.textSecondary, fontWeight: FontWeight.bold)),
+            child: const Text('لاحقاً',
+                style: TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontWeight: FontWeight.bold)),
           ),
           ElevatedButton(
             onPressed: () {
               Get.back();
               _showEmployeesSelectionDialog();
             },
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryTeal, foregroundColor: Colors.white, minimumSize: Size.zero),
-            child: const Text('نعم، إجراء الإغلاق', style: TextStyle(fontWeight: FontWeight.bold)),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryTeal,
+                foregroundColor: Colors.white,
+                minimumSize: Size.zero),
+            child: const Text('نعم، إجراء الإغلاق',
+                style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -101,7 +111,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
     Get.dialog(
       AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('اختيار الموظفين للإغلاق الشهري', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: const Text('اختيار الموظفين للإغلاق الشهري',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
         content: SizedBox(
           width: 500,
           height: 400,
@@ -110,7 +121,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('الموظفين المتاحين', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text('الموظفين المتاحين',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                   Obx(() => Row(
                         children: [
                           Checkbox(
@@ -119,7 +131,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                             onChanged: (val) {
                               isSelectAll.value = val ?? false;
                               if (isSelectAll.value) {
-                                selectedIds.addAll(controller.employees.map((e) => e.id!));
+                                selectedIds.addAll(
+                                    controller.employees.map((e) => e.id!));
                               } else {
                                 selectedIds.clear();
                               }
@@ -141,8 +154,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     itemBuilder: (context, index) {
                       final emp = controller.employees[index];
                       return Obx(() => CheckboxListTile(
-                            title: Text(emp.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                            subtitle: Text('الرقم الوظيفي: ${emp.id}', style: const TextStyle(fontSize: 12)),
+                            title: Text(emp.name,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600)),
+                            subtitle: Text('الرقم الوظيفي: ${emp.id}',
+                                style: const TextStyle(fontSize: 12)),
                             value: selectedIds.contains(emp.id),
                             activeColor: AppTheme.primaryTeal,
                             onChanged: (val) {
@@ -152,7 +168,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                 selectedIds.remove(emp.id);
                                 isSelectAll.value = false;
                               }
-                              if (selectedIds.length == controller.employees.length) {
+                              if (selectedIds.length ==
+                                  controller.employees.length) {
                                 isSelectAll.value = true;
                               }
                             },
@@ -167,7 +184,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('إلغاء', style: TextStyle(color: AppTheme.textSecondary, fontWeight: FontWeight.bold)),
+            child: const Text('إلغاء',
+                style: TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontWeight: FontWeight.bold)),
           ),
           Obx(() => ElevatedButton(
                 onPressed: selectedIds.isEmpty
@@ -176,8 +196,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         Get.back();
                         _processBatchClosing(selectedIds.toList());
                       },
-                style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryTeal, foregroundColor: Colors.white, minimumSize: Size.zero),
-                child: Text('بدء الإغلاق (${selectedIds.length})', style: const TextStyle(fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryTeal,
+                    foregroundColor: Colors.white,
+                    minimumSize: Size.zero),
+                child: Text('بدء الإغلاق (${selectedIds.length})',
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
               )),
         ],
       ),
@@ -187,7 +211,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
   void _processBatchClosing(List<int> empIds) async {
     final controller = Get.find<AdminController>();
     final endDateStr = DateTime.now().toString().split(' ')[0];
-    final startDateStr = DateTime.now().subtract(const Duration(days: 30)).toString().split(' ')[0];
+    final startDateStr = DateTime.now()
+        .subtract(const Duration(days: 30))
+        .toString()
+        .split(' ')[0];
 
     Get.dialog(
       AlertDialog(
@@ -198,9 +225,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
             const SizedBox(height: 16),
             const CircularProgressIndicator(color: AppTheme.primaryTeal),
             const SizedBox(height: 24),
-            const Text('جاري معالجة الإغلاق الشهري...', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('جاري معالجة الإغلاق الشهري...',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            const Text('يرجى الانتظار، قد تستغرق هذه العملية بعض الوقت.', style: TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+            const Text('يرجى الانتظار، قد تستغرق هذه العملية بعض الوقت.',
+                style: TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
             const SizedBox(height: 16),
           ],
         ),
@@ -212,7 +241,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
     List<Map<String, dynamic>> errorList = [];
     for (int id in empIds) {
       final emp = controller.employees.firstWhere((e) => e.id == id);
-      final errorMap = await controller.splitEmployeePayroll(id, startDateStr, endDateStr);
+      final errorMap =
+          await controller.splitEmployeePayroll(id, startDateStr, endDateStr);
       if (errorMap == null || errorMap['status'] == 'success') {
         successCount++;
       } else {
@@ -228,19 +258,22 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
     if (errorList.isEmpty) {
       if (successCount > 0) {
-        UiUtils.showSuccessDialog('اكتمل الإغلاق', 'تم إغلاق $successCount موظف بنجاح من أصل ${empIds.length}.');
+        UiUtils.showSuccessDialog('اكتمل الإغلاق',
+            'تم إغلاق $successCount موظف بنجاح من أصل ${empIds.length}.');
       } else {
         UiUtils.showErrorDialog('تنبيه', 'لا يوجد بيانات لإغلاقها.');
       }
     } else {
       Get.dialog(
         AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: Row(
             children: [
               Icon(Icons.info_outline_rounded, color: AppTheme.primaryGold),
               SizedBox(width: 8),
-              Text('نتيجة الإغلاق', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              Text('نتيجة الإغلاق',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
             ],
           ),
           content: SizedBox(
@@ -258,7 +291,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.check_circle_outline, color: AppTheme.successGreen),
+                        Icon(Icons.check_circle_outline,
+                            color: AppTheme.successGreen),
                         SizedBox(width: 8),
                         Text('تم إغلاق $successCount موظف بنجاح.',
                             style: TextStyle(
@@ -277,7 +311,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     itemCount: errorList.length,
                     itemBuilder: (context, index) {
                       final item = errorList[index];
-                      final List<dynamic> dups = item['duplicates'] as List<dynamic>;
+                      final List<dynamic> dups =
+                          item['duplicates'] as List<dynamic>;
                       return Card(
                         margin: const EdgeInsets.only(bottom: 12.0),
                         elevation: 0,
@@ -293,9 +328,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
                             children: [
                               Row(
                                 children: [
-                                  Icon(Icons.person, size: 16, color: AppTheme.textSecondary),
+                                  Icon(Icons.person,
+                                      size: 16, color: AppTheme.textSecondary),
                                   SizedBox(width: 6),
-                                  Text(item['emp'], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                  Text(item['emp'],
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14)),
                                 ],
                               ),
                               SizedBox(height: 8),
@@ -311,9 +350,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                   runSpacing: 6,
                                   children: dups.map((d) {
                                     return Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 4),
                                       decoration: BoxDecoration(
-                                        color: AppTheme.primaryTeal.withOpacity(0.1),
+                                        color: AppTheme.primaryTeal
+                                            .withOpacity(0.1),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Text(
@@ -342,7 +383,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
           actions: [
             TextButton(
               onPressed: () => Get.back(),
-              child: Text('حسناً', style: TextStyle(fontWeight: FontWeight.bold)),
+              child:
+                  Text('حسناً', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -486,8 +528,7 @@ class _AdminSidebarContent extends StatelessWidget {
                 ListTile(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
-                  leading: Icon(Icons.logout_rounded,
-                      color: AppTheme.errorRed),
+                  leading: Icon(Icons.logout_rounded, color: AppTheme.errorRed),
                   title: const Text('خروج',
                       style: TextStyle(
                           color: AppTheme.errorRed,
@@ -837,8 +878,7 @@ class AdminOverview extends StatelessWidget {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12)),
                             ),
-                            icon:
-                                Icon(Icons.cloud_sync_rounded, size: 20),
+                            icon: Icon(Icons.cloud_sync_rounded, size: 20),
                             label: const Text(
                               'مزامنة الآن',
                               style: TextStyle(fontWeight: FontWeight.bold),
@@ -1018,8 +1058,8 @@ class AdminOverview extends StatelessWidget {
                                     width: 44,
                                     height: 44,
                                     decoration: BoxDecoration(
-                                      color:
-                                          AppTheme.primaryTeal.withValues(alpha: 0.1),
+                                      color: AppTheme.primaryTeal
+                                          .withValues(alpha: 0.1),
                                       shape: BoxShape.circle,
                                     ),
                                     child: Icon(Icons.person_rounded,
@@ -1145,8 +1185,7 @@ class AdminOverview extends StatelessWidget {
                                                             strokeWidth: 2,
                                                             color: AppTheme
                                                                 .errorRed))
-                                                : Icon(
-                                                    Icons.close_rounded,
+                                                : Icon(Icons.close_rounded,
                                                     size: 16),
                                             label: const Text('رفض'),
                                             style: OutlinedButton.styleFrom(
@@ -1181,8 +1220,7 @@ class AdminOverview extends StatelessWidget {
                                                             strokeWidth: 2,
                                                             color:
                                                                 Colors.white))
-                                                : Icon(
-                                                    Icons.check_rounded,
+                                                : Icon(Icons.check_rounded,
                                                     size: 16),
                                             label: const Text('قبول'),
                                             style: ElevatedButton.styleFrom(
@@ -1485,8 +1523,7 @@ class ExceptionItem extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
       subtitle: Text(detail,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(fontSize: 12)),
+          overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12)),
     );
   }
 }

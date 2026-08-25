@@ -574,7 +574,7 @@ class AdminController extends GetxController {
   }
 
   Future<bool> updateVacationStatus(int id, String status,
-      {String? note}) async {
+      {String? note, int? employeeId}) async {
     isLoading.value = true;
     try {
       final res = await _api.putData('vacations/$id', {
@@ -585,6 +585,9 @@ class AdminController extends GetxController {
         fetchVacationRequests();
         fetchEmployees(); // Credit might have changed
         fetchAttendance();
+        if (employeeId != null) {
+          fetchEmployeeMonthlySummary(employeeId);
+        }
         return true;
       }
       return false;
@@ -593,7 +596,7 @@ class AdminController extends GetxController {
     }
   }
 
-  Future<String?> deleteVacation(int id) async {
+  Future<String?> deleteVacation(int id, {int? employeeId}) async {
     isLoading.value = true;
     try {
       final res = await _api.deleteVacation(id);
@@ -604,6 +607,9 @@ class AdminController extends GetxController {
         fetchVacationRequests();
         fetchEmployees();
         fetchAttendance();
+        if (employeeId != null) {
+          fetchEmployeeMonthlySummary(employeeId);
+        }
         return null; // Success
       }
       return 'فشل الاتصال بالخادم';
@@ -667,6 +673,7 @@ class AdminController extends GetxController {
         fetchVacationRequests();
         fetchEmployees();
         fetchAttendance();
+        fetchEmployeeMonthlySummary(request.employeeId);
         return true;
       }
       return false;
@@ -710,6 +717,7 @@ class AdminController extends GetxController {
         fetchVacationRequests();
         fetchEmployees();
         fetchAttendance();
+        fetchEmployeeMonthlySummary(request.employeeId);
         return null; // Success
       }
       return 'فشل الاتصال بالخادم';

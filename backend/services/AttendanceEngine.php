@@ -535,6 +535,8 @@ class AttendanceEngine
             $he = $hourly_early[$d['date']] ?? 0;
             $hb = $hourly_both[$d['date']] ?? 0;
 
+            // Removed the block that converts absent to late
+
             $effectiveLate = max(0, $late - $hl);
             $effectiveEarly = max(0, $early - $he);
 
@@ -564,7 +566,31 @@ class AttendanceEngine
             }
 
             if ($d['status'] === 'absent' && !in_array($d['date'], $full_vacations)) {
-                $discount = $salary / $daysInMonthParam;
+                $total_hv = $hl + $he + $hb;
+                $dailyAbsenceRate = ($daysInMonthParam > 0) ? ($salary / $daysInMonthParam) : 0;
+                $minuteAbsenceRate = ($work_duration > 0) ? ($dailyAbsenceRate / $work_duration) : 0;
+                
+                if ($total_hv > 0) {
+                    $remaining_mins = max(0, $work_duration - $total_hv);
+                    if ($remaining_mins > 0) {
+                        $discount = $remaining_mins * $minuteAbsenceRate;
+                        $d['notes'] = trim(($d['notes'] ?? '') . ' غياب مغطى جزئياً');
+                    } else {
+                        $discount = 0;
+                        $d['status'] = 'vacation';
+                        $totals['vacation_days']++;
+                        $d['notes'] = trim(($d['notes'] ?? '') . ' غياب مغطى بالكامل كإجازة');
+                        $d['late_discount'] = $lateDiscount;
+                        $d['early_exit_discount'] = $earlyDiscount;
+                        $d['discount'] = $discount + $lateDiscount + $earlyDiscount;
+                        $d['late_minutes'] = $effectiveLate;
+                        $d['early_exit_minutes'] = $effectiveEarly;
+                        continue; // Skip the absent_days logic since it's fully covered
+                    }
+                } else {
+                    $discount = $dailyAbsenceRate;
+                }
+                
                 $totals['absent_days']++;
                 $totals['absence_deduction'] += $discount;
             } else if ($d['status'] === 'off') {
@@ -595,6 +621,61 @@ class AttendanceEngine
             ],
             'days' => $final_days,
             'totals' => $totals
+        ];
+    }
+
+    public function autoRunMonthlyPayrollClosingForAll()
+    {
+        $settingModel = new Setting($this->db);
+        $settings = $settingModel->getSettings();
+
+        if (empty($settings['auto_monthly_payroll_enabled']) || $settings['auto_monthly_payroll_enabled'] == 0) {
+            return ['status' => 'disabled', 'message' => 'الإغلاق التلقائي غير مفعل.'];
+        }
+
+        $today = new DateTime();
+        $currentDay = (int) $today->format('d');
+        
+        if ($currentDay >= 25) {
+            $targetMonth = (int) $today->format('m');
+            $targetYear = (int) $today->format('Y');
+        } else {
+            $prevMonthDate = (new DateTime())->modify('-1 month');
+            $targetMonth = (int) $prevMonthDate->format('m');
+            $targetYear = (int) $prevMonthDate->format('Y');
+        }
+
+        $targetMonthStr = sprintf('%04d-%02d', $targetYear, $targetMonth);
+
+        if (!empty($settings['last_auto_closing_month']) && $settings['last_auto_closing_month'] === $targetMonthStr) {
+            return ['status' => 'already_run', 'message' => 'تم تنفيذ الإغلاق التلقائي لهذا الشهر مسبقاً.', 'month' => $targetMonthStr];
+        }
+
+        $empStmt = $this->db->query("SELECT id, name FROM atk_employees WHERE status = 'active'");
+        $employees = $empStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $targetEndDate = sprintf('%04d-%02d-24', $targetYear, $targetMonth);
+
+        $results = [];
+        $totalProcessed = 0;
+
+        foreach ($employees as $emp) {
+            $res = $this->autoClosePastMonths($emp['id'], null, $targetEndDate);
+            $results[] = [
+                'employee_id' => $emp['id'],
+                'name' => $emp['name'],
+                'result' => $res
+            ];
+            $totalProcessed++;
+        }
+
+        $settingModel->updateLastAutoClosingMonth($targetMonthStr);
+
+        return [
+            'status' => 'success',
+            'month' => $targetMonthStr,
+            'processed' => $totalProcessed,
+            'details' => $results
         ];
     }
 }

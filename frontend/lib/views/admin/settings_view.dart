@@ -20,6 +20,8 @@ class SettingsView extends StatelessWidget {
     final lateMins =
         (controller.settings.value?.allowedLateMinutes.toString() ?? '15').obs;
     final ramadanMode = (controller.settings.value?.ramadanMode ?? false).obs;
+    final autoPayrollEnabled =
+        (controller.settings.value?.autoMonthlyPayrollEnabled ?? false).obs;
 
     return SingleChildScrollView(
       padding: EdgeInsets.all(UiUtils.getPadding(context)),
@@ -79,35 +81,61 @@ class SettingsView extends StatelessWidget {
                 _buildNumberInput(
                     'الدقائق المسموح بها للتأخير (فترة السماح)', lateMins),
                 SizedBox(height: 32),
+                const Text('إغلاق الرواتب التلقائي',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppTheme.backgroundLight,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppTheme.borderLight),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryTeal.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.autorenew_rounded,
+                            color: AppTheme.primaryTeal, size: 24),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              'الإغلاق التلقائي لرواتب الشهر السابق',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 15),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'توليد كشوفات الرواتب (atk_monthly_payrolls) تلقائياً لجميع الموظفين عن الشهر السابق في بداية كل شهر جديد.',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppTheme.textSecondary,
+                                  height: 1.4),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Obx(() => Switch.adaptive(
+                            value: autoPayrollEnabled.value,
+                            activeColor: AppTheme.primaryTeal,
+                            onChanged: (v) => autoPayrollEnabled.value = v,
+                          )),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 32),
                 const Divider(),
                 SizedBox(height: 32),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //   children: [
-                //     Expanded(
-                //       child: Column(
-                //         crossAxisAlignment: CrossAxisAlignment.start,
-                //         children: [
-                //           Text('وضع شهر رمضان ',
-                //               style: TextStyle(
-                //                   fontWeight: FontWeight.bold,
-                //                   fontSize: Responsive.isMobile(context)
-                //                       ? 16
-                //                       : 18)),
-                //           const Text('تفعيل مواعيد العمل الخاصة بشهر رمضان',
-                //               style: TextStyle(
-                //                   fontSize: 13, color: AppTheme.textSecondary)),
-                //         ],
-                //       ),
-                //     ),
-                //     Obx(() => Switch.adaptive(
-                //           value: ramadanMode.value,
-                //           activeColor: AppTheme.primaryTeal,
-                //           onChanged: (v) => ramadanMode.value = v,
-                //         )),
-                //   ],
-                // ),
-                // SizedBox(height: 48),
                 SizedBox(
                   width: double.infinity,
                   height: 56,
@@ -126,6 +154,8 @@ class SettingsView extends StatelessWidget {
                         lastRenewalYear:
                             controller.settings.value?.lastRenewalYear ?? 2026,
                         ramadanMode: ramadanMode.value,
+                        autoMonthlyPayrollEnabled: autoPayrollEnabled.value,
+                        lastAutoClosingMonth: controller.settings.value?.lastAutoClosingMonth,
                       );
                       bool success =
                           await controller.updateSettings(newSettings);
@@ -138,7 +168,7 @@ class SettingsView extends StatelessWidget {
                       }
                     },
                     child: controller.isLoading.value 
-                        ? SizedBox(height: 24, width: 24, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                         : const Text('حفظ كافة التغييرات'),
                   )),
                 ),
