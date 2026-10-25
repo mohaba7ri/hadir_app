@@ -122,6 +122,18 @@ class VacationController
                     $total_minutes = $data->total_minutes ?? 0;
                 }
 
+                $vacation_type = trim((string) $vacation_type);
+                if ($vacation_type === '' || $vacation_type === 'أخرى') {
+                    http_response_code(400);
+                    echo json_encode(["status" => "error", "message" => "يرجى كتابة نوع الإجازة."]);
+                    break;
+                }
+                if (mb_strlen($vacation_type, 'UTF-8') > 100) {
+                    http_response_code(400);
+                    echo json_encode(["status" => "error", "message" => "نوع الإجازة يجب ألا يتجاوز 100 حرف."]);
+                    break;
+                }
+
                 if (empty($total_minutes) && !empty($total_days)) {
                     $stmt = $this->db->prepare("SELECT * FROM atk_employees WHERE id = ?");
                     $stmt->execute([$employee_id]);

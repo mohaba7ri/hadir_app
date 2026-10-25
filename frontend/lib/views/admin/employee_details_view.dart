@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../models/app_models.dart';
 import '../../controllers/admin_controller.dart';
+import '../../controllers/auth_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/responsive.dart';
 import '../../core/utils/ui_utils.dart';
@@ -84,7 +85,8 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
           centerTitle: false,
           actions: [
             PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert_rounded, color: AppTheme.primaryTeal),
+              icon: const Icon(Icons.more_vert_rounded,
+                  color: AppTheme.primaryTeal),
               tooltip: 'المزيد من الإجراءات',
               onSelected: (value) {
                 if (value == 'vacations') {
@@ -100,9 +102,11 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                   value: 'vacations',
                   child: Row(
                     children: [
-                      Icon(Icons.beach_access_rounded, size: 20, color: AppTheme.primaryTeal),
+                      Icon(Icons.beach_access_rounded,
+                          size: 20, color: AppTheme.primaryTeal),
                       SizedBox(width: 12),
-                      Text('سجل طلبات الإجازة', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text('سجل طلبات الإجازة',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
@@ -110,9 +114,11 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                   value: 'closings',
                   child: Row(
                     children: [
-                      Icon(Icons.history_edu_rounded, size: 20, color: AppTheme.primaryTeal),
+                      Icon(Icons.history_edu_rounded,
+                          size: 20, color: AppTheme.primaryTeal),
                       SizedBox(width: 12),
-                      Text('سجل الإغلاقات', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text('سجل الإغلاقات',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
@@ -120,9 +126,11 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                   value: 'monthly_close',
                   child: Row(
                     children: [
-                      Icon(Icons.lock_clock_rounded, size: 20, color: AppTheme.primaryTeal),
+                      Icon(Icons.lock_clock_rounded,
+                          size: 20, color: AppTheme.primaryTeal),
                       SizedBox(width: 12),
-                      Text('إغلاق شهري', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text('إغلاق شهري',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
@@ -256,29 +264,33 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
     );
   }
 
-  int _getRemainingMonthlyLimit(EmployeeModel emp, int selectedMonth, int selectedYear) {
+  int _getRemainingMonthlyLimit(
+      EmployeeModel emp, int selectedMonth, int selectedYear) {
     int monthlyLimit = emp.monthlyAnnualLeaveLimitMinutes;
 
     int baselineYear = 2026;
     int baselineMonth = 8;
     DateTime baselineCycleStart = DateTime(2026, 7, 25);
 
-    if (selectedYear < baselineYear || (selectedYear == baselineYear && selectedMonth < baselineMonth)) {
+    if (selectedYear < baselineYear ||
+        (selectedYear == baselineYear && selectedMonth < baselineMonth)) {
       int startMonth = selectedMonth == 1 ? 12 : selectedMonth - 1;
       int startYear = selectedMonth == 1 ? selectedYear - 1 : selectedYear;
-      
+
       DateTime cycleStart = DateTime(startYear, startMonth, 25);
       DateTime cycleEnd = DateTime(selectedYear, selectedMonth, 24, 23, 59, 59);
-      
+
       int usedMinutes = controller.vacationRequests.where((v) {
         if (v.employeeId != emp.id) return false;
         if (v.vacationType != AppConstants.annualLeave) return false;
         if (v.status != 'pending' && v.status != 'approved') return false;
-        
+
         try {
           final reqStart = DateTime.parse(v.startDate);
-          return (reqStart.isAfter(cycleStart) || reqStart.isAtSameMomentAs(cycleStart)) && 
-                 (reqStart.isBefore(cycleEnd) || reqStart.isAtSameMomentAs(cycleEnd));
+          return (reqStart.isAfter(cycleStart) ||
+                  reqStart.isAtSameMomentAs(cycleStart)) &&
+              (reqStart.isBefore(cycleEnd) ||
+                  reqStart.isAtSameMomentAs(cycleEnd));
         } catch (_) {
           return false;
         }
@@ -291,7 +303,8 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
       int curM = baselineMonth;
 
       while (true) {
-        if (curY > selectedYear || (curY == selectedYear && curM > selectedMonth)) {
+        if (curY > selectedYear ||
+            (curY == selectedYear && curM > selectedMonth)) {
           break;
         }
 
@@ -309,8 +322,9 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
 
           try {
             final reqStart = DateTime.parse(v.startDate);
-            return (reqStart.isAfter(cStart) || reqStart.isAtSameMomentAs(cStart)) &&
-                   (reqStart.isBefore(cEnd) || reqStart.isAtSameMomentAs(cEnd));
+            return (reqStart.isAfter(cStart) ||
+                    reqStart.isAtSameMomentAs(cStart)) &&
+                (reqStart.isBefore(cEnd) || reqStart.isAtSameMomentAs(cEnd));
           } catch (_) {
             return false;
           }
@@ -570,7 +584,9 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
     final effectiveLate = att.lateMinutes;
 
     Color statusColor = AppTheme.textSecondary;
-    if (isHoliday || (att.status == 'absent' && hasVacation) || att.status == 'vacation') {
+    if (isHoliday ||
+        (att.status == 'absent' && hasVacation) ||
+        att.status == 'vacation') {
       statusColor = AppTheme.primaryTeal;
     } else if (att.status == 'present' || att.status == 'late') {
       statusColor = effectiveLate > 0 ? Colors.orange : AppTheme.successGreen;
@@ -705,16 +721,24 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                             !isHoliday) ...[
                           SizedBox(height: 4),
                           Builder(builder: (context) {
-                            final hourlyVac = controller.getHourlyVacationRequest(
-                                employee.id ?? 0, att.date);
+                            final hourlyVac =
+                                controller.getHourlyVacationRequest(
+                                    employee.id ?? 0, att.date);
                             double baseAbsenceDisc = 0.0;
                             if (hourlyVac != null) {
-                              baseAbsenceDisc = (att.discount - att.lateDiscount - att.earlyExitDiscount);
+                              baseAbsenceDisc = (att.discount -
+                                  att.lateDiscount -
+                                  att.earlyExitDiscount);
                               if (baseAbsenceDisc < 0) baseAbsenceDisc = 0.0;
                             } else {
                               baseAbsenceDisc = att.discount > 0
-                                  ? (att.discount - att.lateDiscount - att.earlyExitDiscount)
-                                  : ((att.salary > 0 ? att.salary : employee.salary) / controller.daysInMonth);
+                                  ? (att.discount -
+                                      att.lateDiscount -
+                                      att.earlyExitDiscount)
+                                  : ((att.salary > 0
+                                          ? att.salary
+                                          : employee.salary) /
+                                      controller.daysInMonth);
                             }
 
                             if (baseAbsenceDisc <= 0 && hourlyVac != null) {
@@ -911,9 +935,9 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
     final hourlyVac =
         controller.getHourlyVacationRequest(employee.id ?? 0, att.date);
     if (hourlyVac != null) {
-      String statusLabel = hourlyVac.status == 'approved' ? 'معتمدة' : 'قيد الانتظار';
-      String hourlyText =
-          'إجازة (${hourlyVac.totalMinutes}د) $statusLabel';
+      String statusLabel =
+          hourlyVac.status == 'approved' ? 'معتمدة' : 'قيد الانتظار';
+      String hourlyText = 'إجازة (${hourlyVac.totalMinutes}د) $statusLabel';
       if (statusText.isNotEmpty && statusText != 'حاضر') {
         if (hourlyVac.status == 'approved' && att.status == 'absent') {
           statusText = 'غائب (مغطى جزئياً) | $hourlyText';
@@ -991,12 +1015,16 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                     employee.id ?? 0, att.date);
                 double baseAbsenceDisc = 0.0;
                 if (hourlyVac != null) {
-                  baseAbsenceDisc = (att.discount - att.lateDiscount - att.earlyExitDiscount);
+                  baseAbsenceDisc =
+                      (att.discount - att.lateDiscount - att.earlyExitDiscount);
                   if (baseAbsenceDisc < 0) baseAbsenceDisc = 0.0;
                 } else {
                   baseAbsenceDisc = att.discount > 0
-                      ? (att.discount - att.lateDiscount - att.earlyExitDiscount)
-                      : ((att.salary > 0 ? att.salary : employee.salary) / controller.daysInMonth);
+                      ? (att.discount -
+                          att.lateDiscount -
+                          att.earlyExitDiscount)
+                      : ((att.salary > 0 ? att.salary : employee.salary) /
+                          controller.daysInMonth);
                 }
 
                 if (baseAbsenceDisc <= 0 && hourlyVac != null) {
@@ -1163,7 +1191,7 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
       );
       return;
     }
-    
+
     final employee =
         controller.employees.firstWhereOrNull((e) => e.id == att.employeeId);
     final credit = employee?.vacationCredit ?? 0;
@@ -1174,6 +1202,8 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
     final types = AppConstants.getVacationTypes();
 
     final Rx<PlatformFile?> selectedAttachmentFile = Rx<PlatformFile?>(null);
+    final customTypeController = TextEditingController();
+    final customType = ''.obs;
 
     Get.dialog(
       AlertDialog(
@@ -1189,7 +1219,10 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 SizedBox(height: 12),
                 Builder(builder: (context) {
-                  final existingVac = controller.getApprovedVacation(att.employeeId, att.date) ?? controller.getHourlyVacationRequest(att.employeeId, att.date);
+                  final existingVac = controller.getApprovedVacation(
+                          att.employeeId, att.date) ??
+                      controller.getHourlyVacationRequest(
+                          att.employeeId, att.date);
                   if (existingVac == null) return const SizedBox.shrink();
                   return Container(
                     margin: const EdgeInsets.only(bottom: 16),
@@ -1197,19 +1230,24 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                     decoration: BoxDecoration(
                       color: AppTheme.errorRed.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppTheme.errorRed.withValues(alpha: 0.3)),
+                      border: Border.all(
+                          color: AppTheme.errorRed.withValues(alpha: 0.3)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.info_outline_rounded, color: AppTheme.errorRed, size: 18),
+                            const Icon(Icons.info_outline_rounded,
+                                color: AppTheme.errorRed, size: 18),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 'توجد إجازة سابقة لهذا اليوم (${existingVac.totalMinutes > 0 ? "${existingVac.totalMinutes} دقيقة" : "يوم كامل"}) - ${existingVac.vacationType}',
-                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.errorRed),
+                                style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppTheme.errorRed),
                               ),
                             ),
                           ],
@@ -1222,28 +1260,37 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                               Get.back();
                               UiUtils.showConfirmDialog(
                                 title: 'تأكيد الحذف',
-                                message: 'هل أنت متأكد من حذف وإلغاء هذه الإجازة؟',
+                                message:
+                                    'هل أنت متأكد من حذف وإلغاء هذه الإجازة؟',
                                 confirmColor: AppTheme.errorRed,
                                 confirmText: 'حذف الإجازة',
                                 onConfirm: () async {
-                                  final res = await controller.deleteVacation(existingVac.id!, employeeId: att.employeeId);
+                                  final res = await controller.deleteVacation(
+                                      existingVac.id!,
+                                      employeeId: att.employeeId);
                                   if (res == null) {
-                                    UiUtils.showSuccessDialog('تم الحذف', 'تم حذف الإجازة وإلغاء التغطية بنجاح.');
-                                    controller.fetchEmployeeMonthlySummary(att.employeeId);
+                                    UiUtils.showSuccessDialog('تم الحذف',
+                                        'تم حذف الإجازة وإلغاء التغطية بنجاح.');
+                                    controller.fetchEmployeeMonthlySummary(
+                                        att.employeeId);
                                   } else {
                                     UiUtils.showErrorDialog('تعذر الحذف', res);
                                   }
                                 },
                               );
                             },
-                            icon: const Icon(Icons.delete_outline_rounded, size: 16),
-                            label: const Text('حذف وإلغاء الإجازة الحالية', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                            icon: const Icon(Icons.delete_outline_rounded,
+                                size: 16),
+                            label: const Text('حذف وإلغاء الإجازة الحالية',
+                                style: TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.bold)),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppTheme.errorRed,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 8),
                               elevation: 0,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
                             ),
                           ),
                         ),
@@ -1288,6 +1335,22 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                     }).toList(),
                   );
                 }),
+                Obx(() => selectedType.value == AppConstants.otherVacation
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: TextField(
+                          controller: customTypeController,
+                          maxLength: 100,
+                          autofocus: true,
+                          decoration: const InputDecoration(
+                            labelText: 'نوع الإجازة',
+                            hintText: 'اكتب نوع الإجازة',
+                            prefixIcon: Icon(Icons.edit_outlined),
+                          ),
+                          onChanged: (value) => customType.value = value,
+                        ),
+                      )
+                    : const SizedBox.shrink()),
                 SizedBox(height: 16),
                 const Divider(),
                 SizedBox(height: 8),
@@ -1376,7 +1439,9 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                   onPressed: () => Get.back(), child: const Text('إلغاء')),
               SizedBox(width: 8),
               Obx(() => ElevatedButton(
-                    onPressed: controller.isLoading.value
+                    onPressed: controller.isLoading.value ||
+                            (selectedType.value == AppConstants.otherVacation &&
+                                customType.value.trim().isEmpty)
                         ? null
                         : () async {
                             final request = VacationRequestModel(
@@ -1387,7 +1452,10 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                               totalMinutes: controller
                                   .getWorkDayDurationInMinutes(employee),
                               status: 'approved',
-                              vacationType: selectedType.value,
+                              vacationType: AppConstants.resolveVacationType(
+                                selectedType.value,
+                                customTypeController.text,
+                              ),
                             );
                             final errorMsg =
                                 await controller.addVacationRequestWithReason(
@@ -1397,42 +1465,66 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                             if (errorMsg == null) {
                               Get.back();
                               UiUtils.showSuccessDialog('تم بنجاح',
-                                  'تم تحويل يوم الغياب إلى ${selectedType.value}');
+                                  'تم تحويل يوم الغياب إلى ${request.vacationType}');
                               controller
                                   .fetchEmployeeMonthlySummary(att.employeeId);
                             } else {
-                              if (errorMsg is Map && errorMsg['error_type'] == 'limit_exceeded_with_remaining' && errorMsg['remaining_minutes'] != null) {
-                                int remaining = int.tryParse(errorMsg['remaining_minutes'].toString()) ?? 0;
+                              if (errorMsg is Map &&
+                                  errorMsg['error_type'] ==
+                                      'limit_exceeded_with_remaining' &&
+                                  errorMsg['remaining_minutes'] != null) {
+                                int remaining = int.tryParse(
+                                        errorMsg['remaining_minutes']
+                                            .toString()) ??
+                                    0;
                                 if (remaining > 0) {
                                   Get.defaultDialog(
-                                    title: 'تجاوز الحد المسموح',
-                                    middleText: '${errorMsg['message']}\n\nهل تود عمل طلب إجازة بالوقت المتبقي فقط؟',
-                                    textConfirm: 'نعم',
-                                    textCancel: 'لا',
-                                    confirmTextColor: Colors.white,
-                                    onConfirm: () async {
-                                      Get.back();
-                                      request.totalMinutes = remaining;
-                                      request.isHourly = true;
-                                      request.totalDays = 0;
-                                      final retryRes = await controller.addVacationRequestWithReason(request, attachmentFile: selectedAttachmentFile.value);
-                                      if (retryRes == null) {
+                                      title: 'تجاوز الحد المسموح',
+                                      middleText:
+                                          '${errorMsg['message']}\n\nهل تود عمل طلب إجازة بالوقت المتبقي فقط؟',
+                                      textConfirm: 'نعم',
+                                      textCancel: 'لا',
+                                      confirmTextColor: Colors.white,
+                                      onConfirm: () async {
+                                        Get.back();
+                                        request.totalMinutes = remaining;
+                                        request.isHourly = true;
+                                        request.totalDays = 0;
+                                        final retryRes = await controller
+                                            .addVacationRequestWithReason(
+                                                request,
+                                                attachmentFile:
+                                                    selectedAttachmentFile
+                                                        .value);
+                                        if (retryRes == null) {
                                           Get.back();
-                                          UiUtils.showSuccessDialog('تم بنجاح', 'تم تحويل يوم الغياب إلى ${selectedType.value} بالوقت المتبقي');
-                                          controller.fetchEmployeeMonthlySummary(att.employeeId);
-                                      } else {
-                                          String msg = retryRes is Map ? (retryRes['message']?.toString() ?? 'خطأ') : retryRes.toString();
-                                          UiUtils.showErrorDialog('تعذر حفظ الإجازة', msg);
-                                      }
-                                    }
-                                  );
+                                          UiUtils.showSuccessDialog('تم بنجاح',
+                                              'تم تحويل يوم الغياب إلى ${request.vacationType} بالوقت المتبقي');
+                                          controller
+                                              .fetchEmployeeMonthlySummary(
+                                                  att.employeeId);
+                                        } else {
+                                          String msg = retryRes is Map
+                                              ? (retryRes['message']
+                                                      ?.toString() ??
+                                                  'خطأ')
+                                              : retryRes.toString();
+                                          UiUtils.showErrorDialog(
+                                              'تعذر حفظ الإجازة', msg);
+                                        }
+                                      });
                                 } else {
-                                  String msg = errorMsg['message']?.toString() ?? 'خطأ';
-                                  UiUtils.showErrorDialog('تعذر حفظ الإجازة', msg);
+                                  String msg =
+                                      errorMsg['message']?.toString() ?? 'خطأ';
+                                  UiUtils.showErrorDialog(
+                                      'تعذر حفظ الإجازة', msg);
                                 }
                               } else {
-                                String msg = errorMsg is Map ? (errorMsg['message']?.toString() ?? 'خطأ') : errorMsg.toString();
-                                UiUtils.showErrorDialog('تعذر حفظ الإجازة', msg);
+                                String msg = errorMsg is Map
+                                    ? (errorMsg['message']?.toString() ?? 'خطأ')
+                                    : errorMsg.toString();
+                                UiUtils.showErrorDialog(
+                                    'تعذر حفظ الإجازة', msg);
                               }
                             }
                           },
@@ -1471,6 +1563,8 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
     final totalCreditMinutes = employee.vacationCredit;
     final selectedType = AppConstants.annualLeave.obs;
     final vacationTypes = AppConstants.getVacationTypes();
+    final customTypeController = TextEditingController();
+    final customType = ''.obs;
     final reasonController = TextEditingController(
         text: 'تغطية تأخير/خروج مبكر بتاريخ ${att.date} من قبل الإدارة');
     final Rx<PlatformFile?> selectedAttachmentFile = Rx<PlatformFile?>(null);
@@ -1673,6 +1767,23 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                               ),
                             ),
                           )),
+
+                      Obx(() => selectedType.value == AppConstants.otherVacation
+                          ? Padding(
+                              padding: const EdgeInsets.only(top: 12),
+                              child: TextField(
+                                controller: customTypeController,
+                                maxLength: 100,
+                                autofocus: true,
+                                decoration: const InputDecoration(
+                                  labelText: 'نوع الإجازة',
+                                  hintText: 'اكتب نوع الإجازة',
+                                  prefixIcon: Icon(Icons.edit_outlined),
+                                ),
+                                onChanged: (value) => customType.value = value,
+                              ),
+                            )
+                          : const SizedBox.shrink()),
 
                       SizedBox(height: 12),
                       // Credit Status Info Alert
@@ -1879,7 +1990,10 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                         bool hasEnoughCredit =
                             selectedType.value != AppConstants.annualLeave ||
                                 (totalCreditMinutes >= currentTotal);
-                        bool canSubmit = currentTotal > 0 && hasEnoughCredit;
+                        bool canSubmit = currentTotal > 0 &&
+                            hasEnoughCredit &&
+                            (selectedType.value != AppConstants.otherVacation ||
+                                customType.value.trim().isNotEmpty);
 
                         return ElevatedButton(
                           onPressed: controller.isLoading.value || !canSubmit
@@ -1901,7 +2015,11 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                                     totalDays: 0,
                                     totalMinutes: currentTotal,
                                     status: 'approved',
-                                    vacationType: selectedType.value,
+                                    vacationType:
+                                        AppConstants.resolveVacationType(
+                                      selectedType.value,
+                                      customTypeController.text,
+                                    ),
                                     reason: '${reasonController.text} $tag',
                                     isHourly: true,
                                     startTime: '',
@@ -2340,12 +2458,20 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                         double absenceDisc = 0.0;
                         if (effectiveStatus == 'absent') {
                           if (hourlyVac != null) {
-                            absenceDisc = (att.discount - att.lateDiscount - att.earlyExitDiscount);
+                            absenceDisc = (att.discount -
+                                att.lateDiscount -
+                                att.earlyExitDiscount);
                             if (absenceDisc < 0) absenceDisc = 0.0;
-                          } else if (!controller.hasApprovedVacation(att.employeeId, att.date)) {
+                          } else if (!controller.hasApprovedVacation(
+                              att.employeeId, att.date)) {
                             absenceDisc = att.discount > 0
-                                ? (att.discount - att.lateDiscount - att.earlyExitDiscount)
-                                : ((att.salary > 0 ? att.salary : employee.salary) / controller.daysInMonth);
+                                ? (att.discount -
+                                    att.lateDiscount -
+                                    att.earlyExitDiscount)
+                                : ((att.salary > 0
+                                        ? att.salary
+                                        : employee.salary) /
+                                    controller.daysInMonth);
                           }
                         }
                         final totalDisc = lateDisc + earlyDisc + absenceDisc;
@@ -2829,8 +2955,11 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                       SizedBox(height: 8),
                     ],
                     Builder(builder: (context) {
-                      final targetVacation = vacation ?? controller.getHourlyVacationRequest(employee.id ?? 0, att.date);
-                      if (targetVacation == null) return const SizedBox.shrink();
+                      final targetVacation = vacation ??
+                          controller.getHourlyVacationRequest(
+                              employee.id ?? 0, att.date);
+                      if (targetVacation == null)
+                        return const SizedBox.shrink();
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8.0),
                         child: SizedBox(
@@ -2839,28 +2968,35 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                             onPressed: () {
                               Get.back();
                               UiUtils.showConfirmDialog(
-                                title: 'تأكيد الحذف',
-                                message: 'هل أنت متأكد من حذف وإلغاء هذه الإجازة (${targetVacation.totalMinutes > 0 ? "${targetVacation.totalMinutes}د" : "يوم كامل"})؟',
-                                confirmColor: AppTheme.errorRed,
-                                confirmText: 'حذف الإجازة',
-                                onConfirm: () async {
-                                  final res = await controller.deleteVacation(targetVacation.id!, employeeId: employee.id!);
-                                  if (res == null) {
-                                    UiUtils.showSuccessDialog('تم الحذف', 'تم حذف الإجازة وإلغاء التغطية بنجاح.');
-                                    controller.fetchEmployeeMonthlySummary(employee.id!);
-                                  } else {
-                                    UiUtils.showErrorDialog('تعذر الحذف', res);
-                                  }
-                                }
-                              );
+                                  title: 'تأكيد الحذف',
+                                  message:
+                                      'هل أنت متأكد من حذف وإلغاء هذه الإجازة (${targetVacation.totalMinutes > 0 ? "${targetVacation.totalMinutes}د" : "يوم كامل"})؟',
+                                  confirmColor: AppTheme.errorRed,
+                                  confirmText: 'حذف الإجازة',
+                                  onConfirm: () async {
+                                    final res = await controller.deleteVacation(
+                                        targetVacation.id!,
+                                        employeeId: employee.id!);
+                                    if (res == null) {
+                                      UiUtils.showSuccessDialog('تم الحذف',
+                                          'تم حذف الإجازة وإلغاء التغطية بنجاح.');
+                                      controller.fetchEmployeeMonthlySummary(
+                                          employee.id!);
+                                    } else {
+                                      UiUtils.showErrorDialog(
+                                          'تعذر الحذف', res);
+                                    }
+                                  });
                             },
-                            icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                            icon: const Icon(Icons.delete_outline_rounded,
+                                size: 18),
                             label: const Text('إلغاء وحذف الإجازة',
                                 style: TextStyle(fontWeight: FontWeight.bold)),
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: AppTheme.errorRed,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12)),
                                 elevation: 0),
@@ -3292,14 +3428,16 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
       if (r.status == 'absent') absentDays++;
       finalLateDiscount += r.lateDiscount;
       finalEarlyExitDiscount += r.earlyExitDiscount;
-      double baseAbsenceDisc = r.discount - r.lateDiscount - r.earlyExitDiscount;
+      double baseAbsenceDisc =
+          r.discount - r.lateDiscount - r.earlyExitDiscount;
       if (baseAbsenceDisc > 0) {
         finalAbsenceDiscount += baseAbsenceDisc;
       }
       finalTotalDiscount += r.discount;
     }
 
-    final periodStr = '${DateFormat('yyyy-MM-dd').format(start)}_${DateFormat('yyyy-MM-dd').format(end)}';
+    final periodStr =
+        '${DateFormat('yyyy-MM-dd').format(start)}_${DateFormat('yyyy-MM-dd').format(end)}';
 
     await PdfHelper.shareAttendancePdf(
       employee: employee,
@@ -3393,7 +3531,9 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
   }
 
   String _getStatusText(String status,
-      [bool hasEarlyExit = false, bool hasLate = false, VacationRequestModel? vacation]) {
+      [bool hasEarlyExit = false,
+      bool hasLate = false,
+      VacationRequestModel? vacation]) {
     String text = '';
 
     if (hasLate && hasEarlyExit) {
@@ -3445,6 +3585,33 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
     final reasonController =
         TextEditingController(text: 'تصحيح من لوحة التحكم');
 
+    // 1. Check for any existing corrections on atk_attendance_corrections for this employee and date
+    final existingCorrections = controller.correctionRequests
+        .where((c) => c.employeeId == att.employeeId && c.date == att.date)
+        .toList();
+
+    AttendanceCorrectionModel? getMatchingCorrection(String type) {
+      return existingCorrections.firstWhereOrNull((c) =>
+          (type == 'check_in' &&
+              (c.type == 'check_in' || c.type == 'missing_check_in')) ||
+          (type == 'check_out' &&
+              (c.type == 'check_out' || c.type == 'missing_check_out')));
+    }
+
+    // Auto-populate initial time & reason if a correction already exists
+    final initialMatching = getMatchingCorrection(selectedType.value) ??
+        (existingCorrections.isNotEmpty ? existingCorrections.first : null);
+    if (initialMatching != null) {
+      try {
+        final parts = initialMatching.requestedTime.split(':');
+        requestedTime.value =
+            TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+        if (initialMatching.reason.isNotEmpty) {
+          reasonController.text = initialMatching.reason;
+        }
+      } catch (_) {}
+    }
+
     Get.dialog(
       AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
@@ -3468,8 +3635,8 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                 child: Icon(Icons.edit_calendar_rounded,
                     color: AppTheme.primaryGold, size: 32),
               ),
-              SizedBox(height: 16),
-              Text('تصحيح بصمة',
+              const SizedBox(height: 16),
+              const Text('تصحيح بصمة',
                   style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20)),
               Text(att.employeeName ?? 'الموظف',
                   style:
@@ -3478,7 +3645,7 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
           ),
         ),
         content: SizedBox(
-          width: 450,
+          width: 480,
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -3488,16 +3655,182 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                   children: [
                     Icon(Icons.calendar_today_rounded,
                         size: 16, color: AppTheme.textSecondary),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Text('التاريخ: ${att.date}',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
                   ],
                 ),
-                SizedBox(height: 24),
+
+                // 2. Existing Corrections Alert Card (If any exist for this date)
+                if (existingCorrections.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFFBEB), // Soft warm amber
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                          color: const Color(0xFFFDE68A), width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.amber.withValues(alpha: 0.08),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF59E0B)
+                                    .withValues(alpha: 0.15),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.info_outline_rounded,
+                                  color: Color(0xFFD97706), size: 20),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'يوجد طلب تصحيح مسجل بالفعل لهذا اليوم',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 14,
+                                      color: Color(0xFF92400E),
+                                    ),
+                                  ),
+                                  Text(
+                                    'تم العثور على ${existingCorrections.length} تصحيح سابق لهذا الموظف في هذا التاريخ',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: const Color(0xFFB45309)
+                                          .withValues(alpha: 0.9),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        const Divider(height: 1, color: Color(0xFFFDE68A)),
+                        const SizedBox(height: 12),
+                        ...existingCorrections.map((corr) {
+                          final isCheckIn = corr.type == 'check_in' ||
+                              corr.type == 'missing_check_in';
+                          final statusColor = corr.status == 'approved'
+                              ? AppTheme.successGreen
+                              : (corr.status == 'rejected'
+                                  ? AppTheme.errorRed
+                                  : Colors.orange);
+                          final statusText = corr.status == 'approved'
+                              ? 'معتمد'
+                              : (corr.status == 'rejected'
+                                  ? 'مرفوض'
+                                  : 'قيد الانتظار');
+
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                              border:
+                                  Border.all(color: const Color(0xFFF3F4F6)),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: (isCheckIn
+                                            ? AppTheme.primaryTeal
+                                            : AppTheme.primaryGold)
+                                        .withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Icon(
+                                    isCheckIn
+                                        ? Icons.login_rounded
+                                        : Icons.logout_rounded,
+                                    color: isCheckIn
+                                        ? AppTheme.primaryTeal
+                                        : AppTheme.primaryGold,
+                                    size: 18,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            isCheckIn
+                                                ? 'بصمة دخول'
+                                                : 'بصمة خروج',
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 13),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: statusColor.withValues(
+                                                  alpha: 0.12),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              statusText,
+                                              style: TextStyle(
+                                                  color: statusColor,
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'الوقت المسجل: ${_formatTime(corr.requestedTime)}${corr.reason.isNotEmpty ? ' • ${corr.reason}' : ''}',
+                                        style: const TextStyle(
+                                            fontSize: 12,
+                                            color: AppTheme.textSecondary),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+                ],
+
+                const SizedBox(height: 24),
                 const Text('نوع البصمة المطلوب تصحيحها:',
                     style:
                         TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 Obx(() => Container(
                       decoration: BoxDecoration(
                         color: AppTheme.backgroundLight,
@@ -3511,7 +3844,24 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                                   style: TextStyle(fontSize: 13)),
                               value: 'check_in',
                               groupValue: selectedType.value,
-                              onChanged: (v) => selectedType.value = v!,
+                              onChanged: (v) {
+                                if (v != null) {
+                                  selectedType.value = v;
+                                  final matching = getMatchingCorrection(v);
+                                  if (matching != null) {
+                                    try {
+                                      final parts =
+                                          matching.requestedTime.split(':');
+                                      requestedTime.value = TimeOfDay(
+                                          hour: int.parse(parts[0]),
+                                          minute: int.parse(parts[1]));
+                                      if (matching.reason.isNotEmpty) {
+                                        reasonController.text = matching.reason;
+                                      }
+                                    } catch (_) {}
+                                  }
+                                }
+                              },
                               activeColor: AppTheme.primaryGold,
                               contentPadding: EdgeInsets.zero,
                             ),
@@ -3522,7 +3872,24 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                                   style: TextStyle(fontSize: 13)),
                               value: 'check_out',
                               groupValue: selectedType.value,
-                              onChanged: (v) => selectedType.value = v!,
+                              onChanged: (v) {
+                                if (v != null) {
+                                  selectedType.value = v;
+                                  final matching = getMatchingCorrection(v);
+                                  if (matching != null) {
+                                    try {
+                                      final parts =
+                                          matching.requestedTime.split(':');
+                                      requestedTime.value = TimeOfDay(
+                                          hour: int.parse(parts[0]),
+                                          minute: int.parse(parts[1]));
+                                      if (matching.reason.isNotEmpty) {
+                                        reasonController.text = matching.reason;
+                                      }
+                                    } catch (_) {}
+                                  }
+                                }
+                              },
                               activeColor: AppTheme.primaryGold,
                               contentPadding: EdgeInsets.zero,
                             ),
@@ -3530,11 +3897,47 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                         ],
                       ),
                     )),
-                SizedBox(height: 24),
+
+                // 3. Dynamic alert when the selected type already has a correction
+                Obx(() {
+                  final matching = getMatchingCorrection(selectedType.value);
+                  if (matching == null) return const SizedBox.shrink();
+                  return Container(
+                    margin: const EdgeInsets.only(top: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFEF3C7),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                          color:
+                              const Color(0xFFF59E0B).withValues(alpha: 0.5)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.warning_amber_rounded,
+                            color: Color(0xFFD97706), size: 18),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'تنبيه: يوجد تصحيح (${selectedType.value == 'check_in' ? 'دخول' : 'خروج'}) مسجل مسبقاً لهذا اليوم بوقت (${_formatTime(matching.requestedTime)}). سيتم تحديث هذا الطلب.',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF92400E),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+
+                const SizedBox(height: 24),
                 const Text('الوقت المصحح:',
                     style:
                         TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 Obx(() => InkWell(
                       onTap: () async {
                         final picked = await showTimePicker(
@@ -3562,7 +3965,7 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(requestedTime.value.format(context),
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontSize: 18, fontWeight: FontWeight.w900)),
                             Icon(Icons.access_time_filled_rounded,
                                 color: AppTheme.primaryGold),
@@ -3570,11 +3973,11 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                         ),
                       ),
                     )),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
                 const Text('السبب:',
                     style:
                         TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 TextField(
                   controller: reasonController,
                   decoration: InputDecoration(
@@ -3608,22 +4011,55 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                   child: const Text('إلغاء'),
                 ),
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Expanded(
-                child: Obx(() => ElevatedButton(
-                      onPressed: controller.isLoading.value
-                          ? null
-                          : () async {
-                              controller.isLoading.value = true;
-                              try {
-                                final apiService = Get.find<ApiService>();
-                                final timeStr =
-                                    '${requestedTime.value.hour.toString().padLeft(2, '0')}:${requestedTime.value.minute.toString().padLeft(2, '0')}:00';
-                                final originalTime =
-                                    selectedType.value == 'check_in'
-                                        ? att.checkIn
-                                        : att.checkOut;
+                child: Obx(() {
+                  final matching = getMatchingCorrection(selectedType.value);
+                  final bool isUpdate = matching != null;
 
+                  return ElevatedButton(
+                    onPressed: controller.isLoading.value
+                        ? null
+                        : () async {
+                            controller.isLoading.value = true;
+                            try {
+                              final apiService = Get.find<ApiService>();
+                              final timeStr =
+                                  '${requestedTime.value.hour.toString().padLeft(2, '0')}:${requestedTime.value.minute.toString().padLeft(2, '0')}:00';
+                              final originalTime =
+                                  selectedType.value == 'check_in'
+                                      ? att.checkIn
+                                      : att.checkOut;
+
+                              if (isUpdate) {
+                                // Update existing record
+                                final payload = {
+                                  'status': 'approved',
+                                  'requested_time': timeStr,
+                                  'admin_note': reasonController.text,
+                                  'admin_id': Get.find<AuthController>()
+                                      .currentEmployeeId
+                                      .value,
+                                };
+                                final res = await apiService.putData(
+                                    'attendance-corrections/${matching.id}',
+                                    payload);
+
+                                if (res != null &&
+                                    (res is! Map || res['status'] != 'error')) {
+                                  await controller.fetchCorrectionRequests();
+                                  Get.back();
+                                  UiUtils.showSuccessDialog(
+                                      'تم بنجاح', 'تم تحديث طلب التصحيح بنجاح');
+                                  controller.fetchAttendance();
+                                } else {
+                                  UiUtils.showErrorDialog(
+                                      'خطأ',
+                                      res?['message'] ??
+                                          'تعذر تحديث طلب التصحيح');
+                                }
+                              } else {
+                                // Create new record
                                 final payload = {
                                   'employee_id': att.employeeId,
                                   'date': att.date,
@@ -3637,7 +4073,8 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                                 final res = await apiService.postData(
                                     'attendance-corrections', payload);
 
-                                if (res != null) {
+                                if (res != null &&
+                                    (res is! Map || res['status'] != 'error')) {
                                   await controller.fetchCorrectionRequests();
                                   Get.back();
                                   UiUtils.showSuccessDialog(
@@ -3645,30 +4082,52 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                                   controller.fetchAttendance();
                                 } else {
                                   UiUtils.showErrorDialog(
-                                      'خطأ', 'تعذر تقديم طلب التصحيح');
+                                      'خطأ',
+                                      res?['message'] ??
+                                          'تعذر تقديم طلب التصحيح');
                                 }
-                              } finally {
-                                controller.isLoading.value = false;
                               }
-                            },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primaryGold,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16)),
-                        elevation: 0,
-                      ),
-                      child: controller.isLoading.value
-                          ? SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                  color: Colors.white, strokeWidth: 2),
-                            )
-                          : const Text('حفظ وتأكيد',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                    )),
+                            } finally {
+                              controller.isLoading.value = false;
+                            }
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isUpdate
+                          ? AppTheme.primaryTeal
+                          : AppTheme.primaryGold,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
+                      elevation: 0,
+                    ),
+                    child: controller.isLoading.value
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                                color: Colors.white, strokeWidth: 2),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                  isUpdate
+                                      ? Icons.sync_rounded
+                                      : Icons.check_rounded,
+                                  size: 18),
+                              const SizedBox(width: 8),
+                              Text(
+                                isUpdate
+                                    ? 'تحديث التصحيح الحالي'
+                                    : 'حفظ وتأكيد',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                  );
+                }),
               ),
             ],
           ),
@@ -3677,14 +4136,17 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
     );
   }
 
-  void _showSplitPayrollDialog(
-      BuildContext context, EmployeeModel employee, AdminController controller) {
+  void _showSplitPayrollDialog(BuildContext context, EmployeeModel employee,
+      AdminController controller) {
     final endDateStr = DateTime.now().toString().split(' ')[0];
-    final startDateStr = DateTime.now().subtract(const Duration(days: 30)).toString().split(' ')[0];
-    
+    final startDateStr = DateTime.now()
+        .subtract(const Duration(days: 30))
+        .toString()
+        .split(' ')[0];
+
     final selectedStartDate = RxString(startDateStr);
     final selectedEndDate = RxString(endDateStr);
-    
+
     Get.dialog(
       AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -3696,10 +4158,12 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                 color: AppTheme.primaryTeal.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.lock_clock_rounded, color: AppTheme.primaryTeal, size: 24),
+              child: Icon(Icons.lock_clock_rounded,
+                  color: AppTheme.primaryTeal, size: 24),
             ),
             const SizedBox(width: 12),
-            const Text('الإغلاق الشهري', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            const Text('الإغلاق الشهري',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           ],
         ),
         content: Column(
@@ -3716,17 +4180,21 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.info_outline_rounded, color: Colors.blue, size: 20),
+                  Icon(Icons.info_outline_rounded,
+                      color: Colors.blue, size: 20),
                   const SizedBox(width: 8),
                   const Expanded(
-                    child: Text('سيتم إغلاق وحفظ الرواتب للفترة المحددة كفترة مستقلة. سيقوم النظام تلقائياً بتخطي الفترات التي تم إغلاقها مسبقاً لتجنب التكرار.', 
-                      style: TextStyle(color: Colors.black87, fontSize: 12, height: 1.5)),
+                    child: Text(
+                        'سيتم إغلاق وحفظ الرواتب للفترة المحددة كفترة مستقلة. سيقوم النظام تلقائياً بتخطي الفترات التي تم إغلاقها مسبقاً لتجنب التكرار.',
+                        style: TextStyle(
+                            color: Colors.black87, fontSize: 12, height: 1.5)),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 20),
-            const Text('من تاريخ:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            const Text('من تاريخ:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
             const SizedBox(height: 8),
             Obx(() => InkWell(
                   onTap: () async {
@@ -3741,7 +4209,8 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                     }
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
                     decoration: BoxDecoration(
                       color: Colors.grey.shade50,
                       border: Border.all(color: AppTheme.borderLight),
@@ -3750,14 +4219,18 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(selectedStartDate.value, style: const TextStyle(fontWeight: FontWeight.w500)),
-                        Icon(Icons.calendar_month_rounded, size: 20, color: AppTheme.primaryTeal),
+                        Text(selectedStartDate.value,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.w500)),
+                        Icon(Icons.calendar_month_rounded,
+                            size: 20, color: AppTheme.primaryTeal),
                       ],
                     ),
                   ),
                 )),
             const SizedBox(height: 16),
-            const Text('إلى تاريخ:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            const Text('إلى تاريخ:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
             const SizedBox(height: 8),
             Obx(() => InkWell(
                   onTap: () async {
@@ -3772,7 +4245,8 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                     }
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
                     decoration: BoxDecoration(
                       color: Colors.grey.shade50,
                       border: Border.all(color: AppTheme.borderLight),
@@ -3781,8 +4255,11 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(selectedEndDate.value, style: const TextStyle(fontWeight: FontWeight.w500)),
-                        Icon(Icons.calendar_month_rounded, size: 20, color: AppTheme.primaryTeal),
+                        Text(selectedEndDate.value,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.w500)),
+                        Icon(Icons.calendar_month_rounded,
+                            size: 20, color: AppTheme.primaryTeal),
                       ],
                     ),
                   ),
@@ -3792,18 +4269,26 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('إلغاء', style: TextStyle(color: AppTheme.textSecondary, fontWeight: FontWeight.bold)),
+            child: const Text('إلغاء',
+                style: TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontWeight: FontWeight.bold)),
           ),
           ElevatedButton(
             onPressed: () async {
               Get.back();
-              final errorMap = await controller.splitEmployeePayroll(employee.id!, selectedStartDate.value, selectedEndDate.value);
+              final errorMap = await controller.splitEmployeePayroll(
+                  employee.id!, selectedStartDate.value, selectedEndDate.value);
               if (errorMap == null) {
-                UiUtils.showSuccessDialog('نجاح', 'تم إنهاء وحفظ الفترة بنجاح.');
+                UiUtils.showSuccessDialog(
+                    'نجاح', 'تم إنهاء وحفظ الفترة بنجاح.');
               } else if (errorMap['status'] == 'success') {
                 final dups = errorMap['duplicates'] as List<dynamic>? ?? [];
-                final details = dups.isNotEmpty ? '\n\nتم تخطي الفترات المغلقة مسبقاً: ' + dups.join(' , ') : '';
-                UiUtils.showSuccessDialog('تم الإغلاق بنجاح', 'تمت عملية الإغلاق للفترات المطلوبة.$details');
+                final details = dups.isNotEmpty
+                    ? '\n\nتم تخطي الفترات المغلقة مسبقاً: ' + dups.join(' , ')
+                    : '';
+                UiUtils.showSuccessDialog('تم الإغلاق بنجاح',
+                    'تمت عملية الإغلاق للفترات المطلوبة.$details');
               } else {
                 final msg = errorMap['message'] ?? 'خطأ غير معروف';
                 UiUtils.showErrorDialog('تنبيه الإغلاق', msg);
@@ -3813,22 +4298,26 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
               backgroundColor: AppTheme.primaryTeal,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
               elevation: 0,
             ),
-            child: const Text('حفظ الإغلاق', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text('حفظ الإغلاق',
+                style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
     );
   }
+
   void _showClosingsBottomSheet(BuildContext context) {
     Get.dialog(
       Dialog(
         backgroundColor: Colors.transparent,
         child: Container(
           width: 800, // Make it look good on web/desktop
-          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
+          constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.85),
           decoration: BoxDecoration(
             color: AppTheme.backgroundLight,
             borderRadius: BorderRadius.circular(24),
@@ -3841,8 +4330,10 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                  border: Border(bottom: BorderSide(color: AppTheme.borderLight)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(24)),
+                  border:
+                      Border(bottom: BorderSide(color: AppTheme.borderLight)),
                 ),
                 child: Row(
                   children: [
@@ -3852,16 +4343,23 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                         color: AppTheme.primaryTeal.withOpacity(0.1),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(Icons.history_edu_rounded, color: AppTheme.primaryTeal, size: 24),
+                      child: Icon(Icons.history_edu_rounded,
+                          color: AppTheme.primaryTeal, size: 24),
                     ),
                     const SizedBox(width: 16),
                     const Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('سجل الإغلاقات', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppTheme.textPrimary)),
+                          Text('سجل الإغلاقات',
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
+                                  color: AppTheme.textPrimary)),
                           SizedBox(height: 4),
-                          Text('أرشيف الفترات المالية المحفوظة للموظف', style: TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+                          Text('أرشيف الفترات المالية المحفوظة للموظف',
+                              style: TextStyle(
+                                  fontSize: 12, color: AppTheme.textSecondary)),
                         ],
                       ),
                     ),
@@ -3873,7 +4371,8 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                           color: Colors.grey.shade100,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.close_rounded, size: 20, color: AppTheme.textSecondary),
+                        child: const Icon(Icons.close_rounded,
+                            size: 20, color: AppTheme.textSecondary),
                       ),
                     ),
                   ],
@@ -3889,9 +4388,13 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.inbox_rounded, size: 64, color: AppTheme.borderLight),
+                            Icon(Icons.inbox_rounded,
+                                size: 64, color: AppTheme.borderLight),
                             SizedBox(height: 16),
-                            Text('لا توجد إغلاقات محفوظة لهذا الموظف', style: TextStyle(color: AppTheme.textSecondary, fontSize: 16)),
+                            Text('لا توجد إغلاقات محفوظة لهذا الموظف',
+                                style: TextStyle(
+                                    color: AppTheme.textSecondary,
+                                    fontSize: 16)),
                           ],
                         ),
                       ),
@@ -3904,18 +4407,24 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                     itemCount: controller.selectedEmployeeClosings.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 16),
                     itemBuilder: (context, index) {
-                      final closing = controller.selectedEmployeeClosings[index];
+                      final closing =
+                          controller.selectedEmployeeClosings[index];
                       final totals = closing.totals;
-                      
-                      final deductionRaw = double.tryParse((totals['total_deduction'] ?? 0).toString()) ?? 0.0;
+
+                      final deductionRaw = double.tryParse(
+                              (totals['total_deduction'] ?? 0).toString()) ??
+                          0.0;
                       final totalDeductionStr = deductionRaw.toStringAsFixed(2);
-                      
-                      final netSalaryRaw = closing.salarySnapshot - deductionRaw;
+
+                      final netSalaryRaw =
+                          closing.salarySnapshot - deductionRaw;
                       final netSalaryStr = netSalaryRaw.toStringAsFixed(2);
 
-                      final presentDays = (totals['present_days'] ?? 0).toString();
-                      final absentDays = (totals['absent_days'] ?? 0).toString();
-                      
+                      final presentDays =
+                          (totals['present_days'] ?? 0).toString();
+                      final absentDays =
+                          (totals['absent_days'] ?? 0).toString();
+
                       return Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -3934,37 +4443,85 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                           child: Column(
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     children: [
-                                      Icon(Icons.calendar_month_rounded, color: AppTheme.primaryTeal, size: 20),
+                                      Icon(Icons.calendar_month_rounded,
+                                          color: AppTheme.primaryTeal,
+                                          size: 20),
                                       const SizedBox(width: 8),
-                                      Text('الفترة: ${closing.startDate} إلى ${closing.endDate}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                      Text(
+                                          'الفترة: ${closing.startDate} إلى ${closing.endDate}',
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14)),
                                     ],
                                   ),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: AppTheme.primaryTeal.withOpacity(0.1),
+                                      color:
+                                          AppTheme.primaryTeal.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
-                                    child: Text('${closing.month}/${closing.year}', style: const TextStyle(color: AppTheme.primaryTeal, fontWeight: FontWeight.bold, fontSize: 12)),
+                                    child: Text(
+                                        '${closing.month}/${closing.year}',
+                                        style: const TextStyle(
+                                            color: AppTheme.primaryTeal,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12)),
                                   ),
                                 ],
                               ),
                               const Divider(height: 24),
                               Row(
                                 children: [
-                                  Expanded(child: _buildClosingStat('أيام الحضور', presentDays, Icons.check_circle_outline)),
-                                  Container(height: 30, width: 1, color: AppTheme.borderLight),
-                                  Expanded(child: _buildClosingStat('أيام الغياب', absentDays, Icons.event_busy_rounded, color: Colors.orange)),
-                                  Container(height: 30, width: 1, color: AppTheme.borderLight),
-                                  Expanded(child: _buildClosingStat('إجمالي الخصم', '$totalDeductionStr ر.س', Icons.money_off_rounded, color: AppTheme.errorRed)),
-                                  Container(height: 30, width: 1, color: AppTheme.borderLight),
-                                  Expanded(child: _buildClosingStat('الراتب المعتمد', '${closing.salarySnapshot} ر.س', Icons.account_balance_wallet_outlined)),
-                                  Container(height: 30, width: 1, color: AppTheme.borderLight),
-                                  Expanded(child: _buildClosingStat('الصافي', '$netSalaryStr ر.س', Icons.payments_rounded, color: AppTheme.successGreen)),
+                                  Expanded(
+                                      child: _buildClosingStat(
+                                          'أيام الحضور',
+                                          presentDays,
+                                          Icons.check_circle_outline)),
+                                  Container(
+                                      height: 30,
+                                      width: 1,
+                                      color: AppTheme.borderLight),
+                                  Expanded(
+                                      child: _buildClosingStat('أيام الغياب',
+                                          absentDays, Icons.event_busy_rounded,
+                                          color: Colors.orange)),
+                                  Container(
+                                      height: 30,
+                                      width: 1,
+                                      color: AppTheme.borderLight),
+                                  Expanded(
+                                      child: _buildClosingStat(
+                                          'إجمالي الخصم',
+                                          '$totalDeductionStr ر.س',
+                                          Icons.money_off_rounded,
+                                          color: AppTheme.errorRed)),
+                                  Container(
+                                      height: 30,
+                                      width: 1,
+                                      color: AppTheme.borderLight),
+                                  Expanded(
+                                      child: _buildClosingStat(
+                                          'الراتب المعتمد',
+                                          '${closing.salarySnapshot} ر.س',
+                                          Icons
+                                              .account_balance_wallet_outlined)),
+                                  Container(
+                                      height: 30,
+                                      width: 1,
+                                      color: AppTheme.borderLight),
+                                  Expanded(
+                                      child: _buildClosingStat(
+                                          'الصافي',
+                                          '$netSalaryStr ر.س',
+                                          Icons.payments_rounded,
+                                          color: AppTheme.successGreen)),
                                 ],
                               ),
                             ],
@@ -3982,19 +4539,27 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
     );
   }
 
-  Widget _buildClosingStat(String title, String value, IconData icon, {Color? color}) {
+  Widget _buildClosingStat(String title, String value, IconData icon,
+      {Color? color}) {
     return Column(
       children: [
         Icon(icon, size: 20, color: color ?? AppTheme.textSecondary),
         const SizedBox(height: 4),
-        Text(title, style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary)),
+        Text(title,
+            style:
+                const TextStyle(fontSize: 11, color: AppTheme.textSecondary)),
         const SizedBox(height: 2),
-        Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: color ?? AppTheme.textPrimary)),
+        Text(value,
+            style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: color ?? AppTheme.textPrimary)),
       ],
     );
   }
 
-  void _showVacationsHistoryDialog(BuildContext context, AdminController controller, EmployeeModel employee) {
+  void _showVacationsHistoryDialog(BuildContext context,
+      AdminController controller, EmployeeModel employee) {
     int selectedMonth = 0; // 0 = all
     String selectedType = 'الكل';
     final List<String> types = ['الكل', ...AppConstants.getVacationTypes()];
@@ -4004,7 +4569,8 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
-        insetPadding: EdgeInsets.symmetric(horizontal: Responsive.isMobile(context) ? 16 : 32, vertical: 24),
+        insetPadding: EdgeInsets.symmetric(
+            horizontal: Responsive.isMobile(context) ? 16 : 32, vertical: 24),
         child: ConstrainedBox(
           constraints: BoxConstraints(
             maxWidth: 600,
@@ -4012,15 +4578,19 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
           ),
           child: StatefulBuilder(
             builder: (context, setState) {
-              final empVacations = controller.vacationRequests.where((v) => v.employeeId == employee.id).toList();
-              
+              final empVacations = controller.vacationRequests
+                  .where((v) => v.employeeId == employee.id)
+                  .toList();
+
               // Filter
               final filtered = empVacations.where((v) {
-                bool typeMatch = selectedType == 'الكل' || v.vacationType == selectedType;
+                bool typeMatch =
+                    selectedType == 'الكل' || v.vacationType == selectedType;
                 bool monthMatch = true;
                 if (selectedMonth != 0) {
                   try {
-                    monthMatch = DateTime.parse(v.startDate).month == selectedMonth;
+                    monthMatch =
+                        DateTime.parse(v.startDate).month == selectedMonth;
                   } catch (_) {
                     monthMatch = false;
                   }
@@ -4035,20 +4605,29 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: AppTheme.primaryTeal.withValues(alpha: 0.05),
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                      border: Border(bottom: BorderSide(color: AppTheme.borderLight)),
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(24)),
+                      border: Border(
+                          bottom: BorderSide(color: AppTheme.borderLight)),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.beach_access_rounded, color: AppTheme.primaryTeal),
+                        Icon(Icons.beach_access_rounded,
+                            color: AppTheme.primaryTeal),
                         SizedBox(width: 12),
-                        Text('سجل طلبات الإجازة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppTheme.textPrimary)),
+                        Text('سجل طلبات الإجازة',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w900,
+                                color: AppTheme.textPrimary)),
                         const Spacer(),
-                        IconButton(icon: const Icon(Icons.close), onPressed: () => Get.back()),
+                        IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () => Get.back()),
                       ],
                     ),
                   ),
-                  
+
                   // Filters
                   Padding(
                     padding: const EdgeInsets.all(16),
@@ -4059,14 +4638,23 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                             value: selectedMonth,
                             decoration: InputDecoration(
                               labelText: 'الشهر',
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12)),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
                             ),
                             items: [
-                              const DropdownMenuItem(value: 0, child: Text('الكل')),
-                              ...List.generate(12, (index) => DropdownMenuItem(value: index + 1, child: Text(_getMonthNameArabic(index + 1)))),
+                              const DropdownMenuItem(
+                                  value: 0, child: Text('الكل')),
+                              ...List.generate(
+                                  12,
+                                  (index) => DropdownMenuItem(
+                                      value: index + 1,
+                                      child: Text(
+                                          _getMonthNameArabic(index + 1)))),
                             ],
-                            onChanged: (v) => setState(() => selectedMonth = v!),
+                            onChanged: (v) =>
+                                setState(() => selectedMonth = v!),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -4075,10 +4663,15 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                             value: selectedType,
                             decoration: InputDecoration(
                               labelText: 'النوع',
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12)),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
                             ),
-                            items: types.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
+                            items: types
+                                .map((t) =>
+                                    DropdownMenuItem(value: t, child: Text(t)))
+                                .toList(),
                             onChanged: (v) => setState(() => selectedType = v!),
                           ),
                         ),
@@ -4089,20 +4682,33 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                   // List
                   Expanded(
                     child: filtered.isEmpty
-                        ? const Center(child: Text('لا توجد طلبات إجازة تطابق البحث', style: TextStyle(color: AppTheme.textSecondary)))
+                        ? const Center(
+                            child: Text('لا توجد طلبات إجازة تطابق البحث',
+                                style:
+                                    TextStyle(color: AppTheme.textSecondary)))
                         : ListView.separated(
                             padding: const EdgeInsets.all(16),
                             itemCount: filtered.length,
-                            separatorBuilder: (context, index) => const SizedBox(height: 12),
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 12),
                             itemBuilder: (context, index) {
                               final req = filtered[index];
-                              Color statusColor = req.status == 'approved' ? AppTheme.successGreen : (req.status == 'rejected' ? AppTheme.errorRed : Colors.orange);
-                              String statusText = req.status == 'approved' ? 'معتمدة' : (req.status == 'rejected' ? 'مرفوضة' : 'قيد الانتظار');
+                              Color statusColor = req.status == 'approved'
+                                  ? AppTheme.successGreen
+                                  : (req.status == 'rejected'
+                                      ? AppTheme.errorRed
+                                      : Colors.orange);
+                              String statusText = req.status == 'approved'
+                                  ? 'معتمدة'
+                                  : (req.status == 'rejected'
+                                      ? 'مرفوضة'
+                                      : 'قيد الانتظار');
 
                               return Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: AppTheme.borderLight),
+                                  border:
+                                      Border.all(color: AppTheme.borderLight),
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                                 child: Column(
@@ -4110,33 +4716,54 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                                   children: [
                                     Row(
                                       children: [
-                                        Text(req.vacationType, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15)),
+                                        Text(req.vacationType,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w900,
+                                                fontSize: 15)),
                                         const Spacer(),
                                         Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                          decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
-                                          child: Text(statusText, style: TextStyle(color: statusColor, fontSize: 12, fontWeight: FontWeight.bold)),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                              color: statusColor.withValues(
+                                                  alpha: 0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(8)),
+                                          child: Text(statusText,
+                                              style: TextStyle(
+                                                  color: statusColor,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold)),
                                         ),
                                         const SizedBox(width: 8),
                                         IconButton(
                                           onPressed: () {
                                             UiUtils.showConfirmDialog(
-                                              title: 'تأكيد الحذف',
-                                              message: 'هل أنت متأكد من حذف هذه الإجازة؟',
-                                              confirmColor: AppTheme.errorRed,
-                                              confirmText: 'حذف',
-                                              onConfirm: () async {
-                                                final res = await controller.deleteVacation(req.id!);
-                                                if (res == null) {
-                                                  UiUtils.showSuccessDialog('تم الحذف', 'تم حذف الإجازة بنجاح.');
-                                                  controller.fetchEmployeeMonthlySummary(employee.id!);
-                                                } else {
-                                                  UiUtils.showErrorDialog('تعذر الحذف', res);
-                                                }
-                                              }
-                                            );
+                                                title: 'تأكيد الحذف',
+                                                message:
+                                                    'هل أنت متأكد من حذف هذه الإجازة؟',
+                                                confirmColor: AppTheme.errorRed,
+                                                confirmText: 'حذف',
+                                                onConfirm: () async {
+                                                  final res = await controller
+                                                      .deleteVacation(req.id!);
+                                                  if (res == null) {
+                                                    UiUtils.showSuccessDialog(
+                                                        'تم الحذف',
+                                                        'تم حذف الإجازة بنجاح.');
+                                                    controller
+                                                        .fetchEmployeeMonthlySummary(
+                                                            employee.id!);
+                                                  } else {
+                                                    UiUtils.showErrorDialog(
+                                                        'تعذر الحذف', res);
+                                                  }
+                                                });
                                           },
-                                          icon: const Icon(Icons.delete_outline_rounded, size: 20, color: AppTheme.errorRed),
+                                          icon: const Icon(
+                                              Icons.delete_outline_rounded,
+                                              size: 20,
+                                              color: AppTheme.errorRed),
                                           tooltip: 'حذف الإجازة',
                                           padding: EdgeInsets.zero,
                                           constraints: const BoxConstraints(),
@@ -4144,27 +4771,58 @@ class _EmployeeDetailsViewState extends State<EmployeeDetailsView> {
                                       ],
                                     ),
                                     const SizedBox(height: 8),
-                                    Text('${req.startDate}  إلى  ${req.endDate}', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
-                                    if (req.isHourly) Text('إجازة جزئية (${req.totalMinutes} د)', style: const TextStyle(color: AppTheme.primaryTeal, fontSize: 12, fontWeight: FontWeight.bold)),
-                                    if (!req.isHourly) Text('${req.totalDays} يوم', style: const TextStyle(color: AppTheme.primaryTeal, fontSize: 12, fontWeight: FontWeight.bold)),
-                                    if (req.attachment != null && req.attachment!.isNotEmpty) ...[
+                                    Text(
+                                        '${req.startDate}  إلى  ${req.endDate}',
+                                        style: const TextStyle(
+                                            color: AppTheme.textSecondary,
+                                            fontSize: 13)),
+                                    if (req.isHourly)
+                                      Text(
+                                          'إجازة جزئية (${req.totalMinutes} د)',
+                                          style: const TextStyle(
+                                              color: AppTheme.primaryTeal,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold)),
+                                    if (!req.isHourly)
+                                      Text('${req.totalDays} يوم',
+                                          style: const TextStyle(
+                                              color: AppTheme.primaryTeal,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold)),
+                                    if (req.attachment != null &&
+                                        req.attachment!.isNotEmpty) ...[
                                       const SizedBox(height: 12),
                                       InkWell(
                                         onTap: () async {
-                                          final url = Uri.parse('${ApiService.baseApiUrl}/${req.attachment}');
-                                          if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-                                            UiUtils.showErrorDialog('خطأ', 'لا يمكن فتح المرفق');
+                                          final url = Uri.parse(
+                                              '${ApiService.baseApiUrl}/${req.attachment}');
+                                          if (!await launchUrl(url,
+                                              mode: LaunchMode
+                                                  .externalApplication)) {
+                                            UiUtils.showErrorDialog(
+                                                'خطأ', 'لا يمكن فتح المرفق');
                                           }
                                         },
                                         child: Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                          decoration: BoxDecoration(color: Colors.blue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 12, vertical: 8),
+                                          decoration: BoxDecoration(
+                                              color: Colors.blue
+                                                  .withValues(alpha: 0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(8)),
                                           child: const Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              Icon(Icons.attachment_rounded, size: 16, color: Colors.blue),
+                                              Icon(Icons.attachment_rounded,
+                                                  size: 16, color: Colors.blue),
                                               SizedBox(width: 8),
-                                              Text('عرض المرفق', style: TextStyle(color: Colors.blue, fontSize: 12, fontWeight: FontWeight.bold)),
+                                              Text('عرض المرفق',
+                                                  style: TextStyle(
+                                                      color: Colors.blue,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.bold)),
                                             ],
                                           ),
                                         ),

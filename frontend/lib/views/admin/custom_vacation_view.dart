@@ -1,4 +1,3 @@
-import 'package:attendance_management/controllers/auth_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -24,6 +23,7 @@ class _CustomVacationViewState extends State<CustomVacationView> {
   final _startDateController = TextEditingController();
   final _endDateController = TextEditingController();
   final _detailsController = TextEditingController();
+  final _customTypeController = TextEditingController();
 
   String _selectedType = AppConstants.annualLeave;
   final List<String> _vacationTypes = AppConstants.getVacationTypes();
@@ -37,6 +37,15 @@ class _CustomVacationViewState extends State<CustomVacationView> {
     super.initState();
     _startDateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
     _endDateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  }
+
+  @override
+  void dispose() {
+    _startDateController.dispose();
+    _endDateController.dispose();
+    _detailsController.dispose();
+    _customTypeController.dispose();
+    super.dispose();
   }
 
   void _toggleSelectAll(bool? value) {
@@ -81,6 +90,18 @@ class _CustomVacationViewState extends State<CustomVacationView> {
       return;
     }
 
+    final vacationType = AppConstants.resolveVacationType(
+      _selectedType,
+      _customTypeController.text,
+    );
+    if (vacationType.isEmpty) {
+      UiUtils.showErrorDialog(
+        'تنبيه',
+        'يرجى كتابة نوع الإجازة',
+      );
+      return;
+    }
+
     final start = DateTime.parse(_startDateController.text);
     final end = DateTime.parse(_endDateController.text);
 
@@ -104,7 +125,7 @@ class _CustomVacationViewState extends State<CustomVacationView> {
         ],
       ),
       content: Text(
-          'سيتم إضافة إجازة لـ ${_selectedEmployeeIds.length} موظف بمسمى (${_selectedType}).\n\nهل أنت متأكد من المتابعة؟',
+          'سيتم إضافة إجازة لـ ${_selectedEmployeeIds.length} موظف بمسمى ($vacationType).\n\nهل أنت متأكد من المتابعة؟',
           style: TextStyle(fontSize: 14)),
       actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       actions: [
@@ -238,7 +259,7 @@ class _CustomVacationViewState extends State<CustomVacationView> {
         startDate: _startDateController.text,
         endDate: _endDateController.text,
         totalDays: totalDays,
-        vacationType: _selectedType,
+        vacationType: vacationType,
         status: 'approved', // Custom admin vacation is pre-approved
         reason: _detailsController.text,
         employeeName: emp.name,
@@ -286,6 +307,7 @@ class _CustomVacationViewState extends State<CustomVacationView> {
       _selectedEmployeeIds.clear();
       _selectAll.value = false;
       _detailsController.clear();
+      _customTypeController.clear();
       _attachmentFile.value = null;
     }
   }
@@ -370,26 +392,35 @@ class _CustomVacationViewState extends State<CustomVacationView> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: AppTheme.borderLight),
             ),
-            child: Obx(() {
-              final auth = Get.find<AuthController>();
-              final isSuper = auth.isSuperAdmin.value;
-              return DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: _selectedType,
-                  isExpanded: true,
-                  items: _vacationTypes
-                      .map((type) => DropdownMenuItem(
-                            value: type,
-                            child: Text(type),
-                          ))
-                      .toList(),
-                  onChanged: (v) {
-                    if (v != null) setState(() => _selectedType = v);
-                  },
-                ),
-              );
-            }),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: _selectedType,
+                isExpanded: true,
+                items: _vacationTypes
+                    .map((type) => DropdownMenuItem(
+                          value: type,
+                          child: Text(type),
+                        ))
+                    .toList(),
+                onChanged: (v) {
+                  if (v != null) setState(() => _selectedType = v);
+                },
+              ),
+            ),
           ),
+          if (_selectedType == AppConstants.otherVacation) ...[
+            const SizedBox(height: 12),
+            TextField(
+              controller: _customTypeController,
+              maxLength: 100,
+              autofocus: true,
+              decoration: const InputDecoration(
+                labelText: 'نوع الإجازة',
+                hintText: 'اكتب نوع الإجازة',
+                prefixIcon: Icon(Icons.edit_outlined),
+              ),
+            ),
+          ],
           SizedBox(height: 20),
           Row(
             children: [

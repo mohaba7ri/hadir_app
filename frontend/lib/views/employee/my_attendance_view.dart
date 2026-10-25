@@ -29,10 +29,13 @@ class MyAttendanceView extends StatelessWidget {
                 SizedBox(width: 12),
                 IconButton(
                   onPressed: () => controller.fetchMonthlySummary(),
-                  icon: Icon(Icons.refresh_rounded, color: AppTheme.primaryTeal),
+                  icon:
+                      Icon(Icons.refresh_rounded, color: AppTheme.primaryTeal),
                   style: IconButton.styleFrom(
-                    backgroundColor: AppTheme.primaryTeal.withValues(alpha: 0.1),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    backgroundColor:
+                        AppTheme.primaryTeal.withValues(alpha: 0.1),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
                     minimumSize: const Size(48, 48),
                   ),
                 ),
@@ -44,17 +47,42 @@ class MyAttendanceView extends StatelessWidget {
               clipBehavior: Clip.none,
               child: Row(
                 children: [
-                  Obx(() => _buildStatCard(context, 'إجمالي الخصم', '${controller.totalDiscount.toStringAsFixed(2)} ر.س', Icons.account_balance_wallet_rounded, AppTheme.errorRed)),
+                  Obx(() => _buildStatCard(
+                      context,
+                      'إجمالي الخصم',
+                      '${controller.totalDiscount.toStringAsFixed(2)} ر.س',
+                      Icons.account_balance_wallet_rounded,
+                      AppTheme.errorRed)),
                   SizedBox(width: 12),
-                  Obx(() => _buildStatCard(context, 'خصم الغياب', '${controller.totalAbsentDiscount.toStringAsFixed(2)} ر.س', Icons.event_busy_rounded, AppTheme.errorRed)),
+                  Obx(() => _buildStatCard(
+                      context,
+                      'خصم الغياب',
+                      '${controller.totalAbsentDiscount.toStringAsFixed(2)} ر.س',
+                      Icons.event_busy_rounded,
+                      AppTheme.errorRed)),
                   SizedBox(width: 12),
-                  Obx(() => _buildStatCard(context, 'خصم التأخير', '${controller.totalLateDiscount.toStringAsFixed(2)} ر.س', Icons.access_time_rounded, Colors.orange)),
+                  Obx(() => _buildStatCard(
+                      context,
+                      'خصم التأخير',
+                      '${controller.totalLateDiscount.toStringAsFixed(2)} ر.س',
+                      Icons.access_time_rounded,
+                      Colors.orange)),
                   SizedBox(width: 12),
-                  Obx(() => _buildStatCard(context, 'خصم خروج مبكر', '${controller.totalEarlyExitDiscount.toStringAsFixed(2)} ر.س', Icons.logout_rounded, Colors.orange)),
+                  Obx(() => _buildStatCard(
+                      context,
+                      'خصم خروج مبكر',
+                      '${controller.totalEarlyExitDiscount.toStringAsFixed(2)} ر.س',
+                      Icons.logout_rounded,
+                      Colors.orange)),
                   SizedBox(width: 12),
                   Obx(() {
                     if (controller.totalOvertimeGained > 0) {
-                      return _buildStatCard(context, 'مكافأة الإضافي', '+${controller.totalOvertimeGained.toStringAsFixed(2)} ر.س', Icons.more_time_rounded, AppTheme.successGreen);
+                      return _buildStatCard(
+                          context,
+                          'مكافأة الإضافي',
+                          '+${controller.totalOvertimeGained.toStringAsFixed(2)} ر.س',
+                          Icons.more_time_rounded,
+                          AppTheme.successGreen);
                     }
                     return const SizedBox.shrink();
                   }),
@@ -69,13 +97,38 @@ class MyAttendanceView extends StatelessWidget {
               runSpacing: 16,
               children: [
                 _buildFilterDropdowns(controller),
-                Obx(() => _buildStatCard(context, 'إجمالي الخصم', '${controller.totalDiscount.toStringAsFixed(2)} ر.س', Icons.account_balance_wallet_rounded, AppTheme.errorRed)),
-                Obx(() => _buildStatCard(context, 'خصم الغياب', '${controller.totalAbsentDiscount.toStringAsFixed(2)} ر.س', Icons.event_busy_rounded, AppTheme.errorRed)),
-                Obx(() => _buildStatCard(context, 'خصم التأخير', '${controller.totalLateDiscount.toStringAsFixed(2)} ر.س', Icons.access_time_rounded, Colors.orange)),
-                Obx(() => _buildStatCard(context, 'خصم خروج مبكر', '${controller.totalEarlyExitDiscount.toStringAsFixed(2)} ر.س', Icons.logout_rounded, Colors.orange)),
+                Obx(() => _buildStatCard(
+                    context,
+                    'إجمالي الخصم',
+                    '${controller.totalDiscount.toStringAsFixed(2)} ر.س',
+                    Icons.account_balance_wallet_rounded,
+                    AppTheme.errorRed)),
+                Obx(() => _buildStatCard(
+                    context,
+                    'خصم الغياب',
+                    '${controller.totalAbsentDiscount.toStringAsFixed(2)} ر.س',
+                    Icons.event_busy_rounded,
+                    AppTheme.errorRed)),
+                Obx(() => _buildStatCard(
+                    context,
+                    'خصم التأخير',
+                    '${controller.totalLateDiscount.toStringAsFixed(2)} ر.س',
+                    Icons.access_time_rounded,
+                    Colors.orange)),
+                Obx(() => _buildStatCard(
+                    context,
+                    'خصم خروج مبكر',
+                    '${controller.totalEarlyExitDiscount.toStringAsFixed(2)} ر.س',
+                    Icons.logout_rounded,
+                    Colors.orange)),
                 Obx(() {
                   if (controller.totalOvertimeGained > 0) {
-                    return _buildStatCard(context, 'مكافأة الإضافي', '+${controller.totalOvertimeGained.toStringAsFixed(2)} ر.س', Icons.more_time_rounded, AppTheme.successGreen);
+                    return _buildStatCard(
+                        context,
+                        'مكافأة الإضافي',
+                        '+${controller.totalOvertimeGained.toStringAsFixed(2)} ر.س',
+                        Icons.more_time_rounded,
+                        AppTheme.successGreen);
                   }
                   return const SizedBox.shrink();
                 }),
@@ -114,8 +167,7 @@ class MyAttendanceView extends StatelessWidget {
                   }
                   return ListView.separated(
                     itemCount: controller.filteredAttendance.length,
-                    separatorBuilder: (context, index) =>
-                        SizedBox(height: 2),
+                    separatorBuilder: (context, index) => SizedBox(height: 2),
                     itemBuilder: (context, index) {
                       final att = controller.filteredAttendance[index];
                       final isApproved =
@@ -354,8 +406,8 @@ class MyAttendanceView extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCard(
-      BuildContext context, String label, String value, IconData icon, Color color) {
+  Widget _buildStatCard(BuildContext context, String label, String value,
+      IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
       width: Responsive.isMobile(context) ? 150 : 200,
@@ -651,14 +703,21 @@ class MyAttendanceView extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryTeal.withValues(alpha: 0.1) : Colors.white,
+          color: isSelected
+              ? AppTheme.primaryTeal.withValues(alpha: 0.1)
+              : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? AppTheme.primaryTeal : AppTheme.borderLight,
             width: isSelected ? 2 : 1,
           ),
           boxShadow: isSelected
-              ? [BoxShadow(color: AppTheme.primaryTeal.withValues(alpha: 0.2), blurRadius: 8, offset: Offset(0, 4))]
+              ? [
+                  BoxShadow(
+                      color: AppTheme.primaryTeal.withValues(alpha: 0.2),
+                      blurRadius: 8,
+                      offset: Offset(0, 4))
+                ]
               : [],
         ),
         child: Row(
@@ -666,24 +725,42 @@ class MyAttendanceView extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: isSelected ? AppTheme.primaryTeal : AppTheme.backgroundLight,
+                color: isSelected
+                    ? AppTheme.primaryTeal
+                    : AppTheme.backgroundLight,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: isSelected ? Colors.white : AppTheme.textSecondary, size: 20),
+              child: Icon(icon,
+                  color: isSelected ? Colors.white : AppTheme.textSecondary,
+                  size: 20),
             ),
             SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isSelected ? AppTheme.primaryTeal : AppTheme.textPrimary)),
-                  Text(subtitle, style: TextStyle(fontSize: 12, color: AppTheme.textSecondary, fontWeight: FontWeight.bold)),
+                  Text(title,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          color: isSelected
+                              ? AppTheme.primaryTeal
+                              : AppTheme.textPrimary)),
+                  Text(subtitle,
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.textSecondary,
+                          fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
             Icon(
-              isSelected ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
-              color: isSelected ? AppTheme.primaryTeal : AppTheme.textSecondary.withValues(alpha: 0.5),
+              isSelected
+                  ? Icons.check_circle_rounded
+                  : Icons.radio_button_unchecked_rounded,
+              color: isSelected
+                  ? AppTheme.primaryTeal
+                  : AppTheme.textSecondary.withValues(alpha: 0.5),
             ),
           ],
         ),
@@ -691,7 +768,8 @@ class MyAttendanceView extends StatelessWidget {
     );
   }
 
-  Widget _buildProTimeBox(String label, String time, IconData icon, Color color, {bool isCorrected = false}) {
+  Widget _buildProTimeBox(String label, String time, IconData icon, Color color,
+      {bool isCorrected = false}) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -706,12 +784,23 @@ class MyAttendanceView extends StatelessWidget {
             children: [
               Icon(icon, size: 16, color: color.withValues(alpha: 0.8)),
               SizedBox(width: 8),
-              Expanded(child: Text(label, style: TextStyle(fontSize: 11, color: AppTheme.textSecondary, fontWeight: FontWeight.bold))),
-              if (isCorrected) Icon(Icons.edit_note_rounded, size: 16, color: AppTheme.primaryTeal),
+              Expanded(
+                  child: Text(label,
+                      style: TextStyle(
+                          fontSize: 11,
+                          color: AppTheme.textSecondary,
+                          fontWeight: FontWeight.bold))),
+              if (isCorrected)
+                Icon(Icons.edit_note_rounded,
+                    size: 16, color: AppTheme.primaryTeal),
             ],
           ),
           SizedBox(height: 8),
-          Text(time, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: AppTheme.textPrimary)),
+          Text(time,
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w900,
+                  color: AppTheme.textPrimary)),
         ],
       ),
     );
@@ -729,11 +818,11 @@ class MyAttendanceView extends StatelessWidget {
     final showEarly = false.obs;
 
     final workDayMinutes = controller.getSystemWorkDayDurationInMinutes();
-    final totalCreditMinutes = controller.employeeData.value?.vacationCredit ?? 0;
+    final totalCreditMinutes =
+        controller.employeeData.value?.vacationCredit ?? 0;
     final int usedMinutes = controller.myVacationRequests
         .where((v) =>
-            v.vacationType == AppConstants.annualLeave &&
-            v.status == 'pending')
+            v.vacationType == AppConstants.annualLeave && v.status == 'pending')
         .fold(0, (sum, v) => sum + v.totalMinutes);
     final remainingMinutes = totalCreditMinutes - usedMinutes;
 
@@ -744,6 +833,8 @@ class MyAttendanceView extends StatelessWidget {
         text: isAbsent
             ? 'إجازة ليوم غياب بتاريخ ${att.date}'
             : 'تغطية تأخير/خروج مبكر بتاريخ ${att.date}');
+    final customTypeController = TextEditingController();
+    final customType = ''.obs;
     final RxBool isLoading = false.obs;
     final Rx<PlatformFile?> selectedAttachmentFile = Rx<PlatformFile?>(null);
 
@@ -752,7 +843,8 @@ class MyAttendanceView extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
-        insetPadding: EdgeInsets.symmetric(horizontal: Responsive.isMobile(context) ? 16 : 32, vertical: 24),
+        insetPadding: EdgeInsets.symmetric(
+            horizontal: Responsive.isMobile(context) ? 16 : 32, vertical: 24),
         child: ConstrainedBox(
           constraints: BoxConstraints(
             maxWidth: Responsive.isDesktop(context) ? 450 : 400,
@@ -766,8 +858,10 @@ class MyAttendanceView extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: AppTheme.primaryTeal.withValues(alpha: 0.05),
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                  border: Border(bottom: BorderSide(color: AppTheme.borderLight)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(24)),
+                  border:
+                      Border(bottom: BorderSide(color: AppTheme.borderLight)),
                 ),
                 child: Row(
                   children: [
@@ -776,24 +870,49 @@ class MyAttendanceView extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
-                        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 10)
+                        ],
                       ),
-                      child: Icon(isAbsent ? Icons.event_busy_rounded : Icons.beach_access_rounded, color: AppTheme.primaryTeal, size: 24),
+                      child: Icon(
+                          isAbsent
+                              ? Icons.event_busy_rounded
+                              : Icons.beach_access_rounded,
+                          color: AppTheme.primaryTeal,
+                          size: 24),
                     ),
                     SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(isAbsent ? 'طلب إجازة ليوم غياب' : 'تغطية تأخير أو خروج مبكر', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: AppTheme.textPrimary)),
-                          Text(isAbsent ? 'تقديم طلب إجازة ليوم كامل' : 'تطبيق إجازة لتعويض الدقائق المفقودة', style: TextStyle(color: AppTheme.textSecondary, fontSize: 12, fontWeight: FontWeight.bold)),
+                          Text(
+                              isAbsent
+                                  ? 'طلب إجازة ليوم غياب'
+                                  : 'تغطية تأخير أو خروج مبكر',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 16,
+                                  color: AppTheme.textPrimary)),
+                          Text(
+                              isAbsent
+                                  ? 'تقديم طلب إجازة ليوم كامل'
+                                  : 'تطبيق إجازة لتعويض الدقائق المفقودة',
+                              style: TextStyle(
+                                  color: AppTheme.textSecondary,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ),
                     IconButton(
                       onPressed: () => Get.back(),
-                      icon: Icon(Icons.close_rounded, color: AppTheme.textSecondary),
-                      style: IconButton.styleFrom(backgroundColor: Colors.white),
+                      icon: Icon(Icons.close_rounded,
+                          color: AppTheme.textSecondary),
+                      style:
+                          IconButton.styleFrom(backgroundColor: Colors.white),
                     ),
                   ],
                 ),
@@ -807,13 +926,16 @@ class MyAttendanceView extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (!isAbsent) ...[
-                        const Text('تحديد الفترات المراد تغطيتها', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+                        const Text('تحديد الفترات المراد تغطيتها',
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w900)),
                         SizedBox(height: 12),
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             color: Colors.blue.withValues(alpha: 0.05),
-                            border: Border.all(color: Colors.blue.withValues(alpha: 0.15)),
+                            border: Border.all(
+                                color: Colors.blue.withValues(alpha: 0.15)),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -844,7 +966,8 @@ class MyAttendanceView extends StatelessWidget {
                                 isSelected: showLate.value,
                                 onTap: () => showLate.value = !showLate.value,
                               )),
-                        if (initialLateMins > 0 && initialEarlyExitMins > 0) SizedBox(height: 12),
+                        if (initialLateMins > 0 && initialEarlyExitMins > 0)
+                          SizedBox(height: 12),
                         if (initialEarlyExitMins > 0)
                           Obx(() => _buildSelectableProTile(
                                 title: 'وقت الخروج المبكر',
@@ -855,12 +978,15 @@ class MyAttendanceView extends StatelessWidget {
                               )),
                         SizedBox(height: 20),
                       ],
-                      
+
                       // Total Calculation Box
                       Obx(() {
                         final bool isLateSelected = showLate.value;
                         final bool isEarlySelected = showEarly.value;
-                        int total = isAbsent ? workDayMinutes : ((isLateSelected ? initialLateMins : 0) + (isEarlySelected ? initialEarlyExitMins : 0));
+                        int total = isAbsent
+                            ? workDayMinutes
+                            : ((isLateSelected ? initialLateMins : 0) +
+                                (isEarlySelected ? initialEarlyExitMins : 0));
                         return Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
@@ -871,40 +997,80 @@ class MyAttendanceView extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(isAbsent ? 'مدة الإجازة (يوم كامل):' : 'إجمالي الدقائق المستقطعة:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textSecondary)),
+                              Text(
+                                  isAbsent
+                                      ? 'مدة الإجازة (يوم كامل):'
+                                      : 'إجمالي الدقائق المستقطعة:',
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppTheme.textSecondary)),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: AppTheme.primaryTeal.withValues(alpha: 0.1),
+                                  color: AppTheme.primaryTeal
+                                      .withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: Text('$total دقيقة', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: AppTheme.primaryTeal)),
+                                child: Text('$total دقيقة',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w900,
+                                        color: AppTheme.primaryTeal)),
                               ),
                             ],
                           ),
                         );
                       }),
-                      
+
                       SizedBox(height: 24),
-                      const Text('نوع الإجازة التعويضية', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+                      const Text('نوع الإجازة التعويضية',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.w900)),
                       SizedBox(height: 12),
                       Obx(() => Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 4),
                             decoration: BoxDecoration(
-                               color: Colors.white,
-                               border: Border.all(color: AppTheme.borderLight),
-                               borderRadius: BorderRadius.circular(12),
+                              color: Colors.white,
+                              border: Border.all(color: AppTheme.borderLight),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
                                 value: selectedType.value,
                                 isExpanded: true,
-                                icon: Icon(Icons.keyboard_arrow_down_rounded, color: AppTheme.textSecondary),
-                                items: vacationTypes.map((t) => DropdownMenuItem(value: t, child: Text(t, style: TextStyle(fontWeight: FontWeight.bold)))).toList(),
+                                icon: Icon(Icons.keyboard_arrow_down_rounded,
+                                    color: AppTheme.textSecondary),
+                                items: vacationTypes
+                                    .map((t) => DropdownMenuItem(
+                                        value: t,
+                                        child: Text(t,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold))))
+                                    .toList(),
                                 onChanged: (v) => selectedType.value = v!,
                               ),
                             ),
                           )),
+
+                      Obx(() => selectedType.value == AppConstants.otherVacation
+                          ? Padding(
+                              padding: const EdgeInsets.only(top: 12),
+                              child: TextField(
+                                controller: customTypeController,
+                                maxLength: 100,
+                                autofocus: true,
+                                decoration: const InputDecoration(
+                                  labelText: 'نوع الإجازة',
+                                  hintText: 'اكتب نوع الإجازة',
+                                  prefixIcon: Icon(Icons.edit_outlined),
+                                ),
+                                onChanged: (value) => customType.value = value,
+                              ),
+                            )
+                          : const SizedBox.shrink()),
 
                       SizedBox(height: 12),
                       // Credit Status Info Alert
@@ -912,18 +1078,26 @@ class MyAttendanceView extends StatelessWidget {
                           ? Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: AppTheme.primaryTeal.withValues(alpha: 0.05),
+                                color: AppTheme.primaryTeal
+                                    .withValues(alpha: 0.05),
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: AppTheme.primaryTeal.withValues(alpha: 0.2)),
+                                border: Border.all(
+                                    color: AppTheme.primaryTeal
+                                        .withValues(alpha: 0.2)),
                               ),
                               child: Row(
                                 children: [
-                                  Icon(Icons.info_outline_rounded, size: 20, color: AppTheme.primaryTeal),
+                                  Icon(Icons.info_outline_rounded,
+                                      size: 20, color: AppTheme.primaryTeal),
                                   SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
                                       'رصيد إجازاتك المتاح حالياً: ${UiUtils.formatDaysApproximate(remainingMinutes / workDayMinutes)} (${UiUtils.formatDuration(remainingMinutes)})',
-                                      style: TextStyle(fontSize: 12, color: AppTheme.primaryTeal, fontWeight: FontWeight.bold, height: 1.4),
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: AppTheme.primaryTeal,
+                                          fontWeight: FontWeight.bold,
+                                          height: 1.4),
                                     ),
                                   ),
                                 ],
@@ -934,40 +1108,63 @@ class MyAttendanceView extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: Colors.orange.withValues(alpha: 0.05),
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.orange.withValues(alpha: 0.2)),
+                                border: Border.all(
+                                    color:
+                                        Colors.orange.withValues(alpha: 0.2)),
                               ),
                               child: Row(
                                 children: [
-                                  Icon(Icons.warning_amber_rounded, size: 20, color: Colors.orange),
+                                  Icon(Icons.warning_amber_rounded,
+                                      size: 20, color: Colors.orange),
                                   SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
                                       'ملاحظة: هذا النوع من الإجازات لا يخصم من رصيد الإجازات السنوية، ويتطلب موافقة الإدارة.',
-                                      style: TextStyle(fontSize: 12, color: Colors.orange, fontWeight: FontWeight.bold, height: 1.4),
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.orange,
+                                          fontWeight: FontWeight.bold,
+                                          height: 1.4),
                                     ),
                                   ),
                                 ],
                               ),
                             )),
-                            
+
                       SizedBox(height: 24),
-                      const Text('السبب / الملاحظات (اختياري)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+                      const Text('السبب / الملاحظات (اختياري)',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.w900)),
                       SizedBox(height: 12),
                       TextField(
                         controller: reasonController,
                         maxLines: 2,
                         decoration: InputDecoration(
                           hintText: 'أضف ملاحظة توضيحية...',
-                          hintStyle: TextStyle(color: AppTheme.textSecondary.withValues(alpha: 0.5), fontSize: 13),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AppTheme.borderLight)),
-                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AppTheme.borderLight)),
-                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AppTheme.primaryTeal)),
+                          hintStyle: TextStyle(
+                              color:
+                                  AppTheme.textSecondary.withValues(alpha: 0.5),
+                              fontSize: 13),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide:
+                                  BorderSide(color: AppTheme.borderLight)),
+                          enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide:
+                                  BorderSide(color: AppTheme.borderLight)),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide:
+                                  BorderSide(color: AppTheme.primaryTeal)),
                           filled: true,
                           fillColor: AppTheme.backgroundLight,
                         ),
                       ),
                       SizedBox(height: 16),
-                      const Text('المرفقات (اختياري)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+                      const Text('المرفقات (اختياري)',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.w900)),
                       SizedBox(height: 12),
                       Obx(() => Container(
                             width: double.infinity,
@@ -982,40 +1179,57 @@ class MyAttendanceView extends StatelessWidget {
                                 if (selectedAttachmentFile.value == null)
                                   ElevatedButton.icon(
                                     onPressed: () async {
-                                      FilePickerResult? result = await FilePicker.platform.pickFiles(
+                                      FilePickerResult? result =
+                                          await FilePicker.platform.pickFiles(
                                         type: FileType.custom,
-                                        allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+                                        allowedExtensions: [
+                                          'jpg',
+                                          'jpeg',
+                                          'png',
+                                          'pdf'
+                                        ],
                                         withData: kIsWeb,
                                       );
                                       if (result != null) {
-                                        selectedAttachmentFile.value = result.files.single;
+                                        selectedAttachmentFile.value =
+                                            result.files.single;
                                       }
                                     },
-                                    icon: Icon(Icons.upload_file_rounded, size: 18),
-                                    label: const Text('اختيار ملف أو صورة', style: TextStyle(fontSize: 12)),
+                                    icon: Icon(Icons.upload_file_rounded,
+                                        size: 18),
+                                    label: const Text('اختيار ملف أو صورة',
+                                        style: TextStyle(fontSize: 12)),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.white,
                                       foregroundColor: AppTheme.primaryTeal,
                                       elevation: 0,
-                                      side: BorderSide(color: AppTheme.primaryTeal),
-                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                      side: BorderSide(
+                                          color: AppTheme.primaryTeal),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 8),
                                       minimumSize: const Size(0, 40),
                                     ),
                                   )
                                 else
                                   Row(
                                     children: [
-                                      Icon(Icons.check_circle_rounded, color: AppTheme.successGreen, size: 20),
+                                      Icon(Icons.check_circle_rounded,
+                                          color: AppTheme.successGreen,
+                                          size: 20),
                                       SizedBox(width: 8),
                                       Expanded(
                                         child: Text(
                                           selectedAttachmentFile.value!.name,
-                                          style: TextStyle(fontSize: 11, overflow: TextOverflow.ellipsis),
+                                          style: TextStyle(
+                                              fontSize: 11,
+                                              overflow: TextOverflow.ellipsis),
                                         ),
                                       ),
                                       IconButton(
-                                        onPressed: () => selectedAttachmentFile.value = null,
-                                        icon: Icon(Icons.cancel_outlined, color: AppTheme.errorRed, size: 18),
+                                        onPressed: () =>
+                                            selectedAttachmentFile.value = null,
+                                        icon: Icon(Icons.cancel_outlined,
+                                            color: AppTheme.errorRed, size: 18),
                                       ),
                                     ],
                                   ),
@@ -1033,7 +1247,8 @@ class MyAttendanceView extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppTheme.backgroundLight,
                   border: Border(top: BorderSide(color: AppTheme.borderLight)),
-                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
+                  borderRadius:
+                      const BorderRadius.vertical(bottom: Radius.circular(24)),
                 ),
                 child: Row(
                   children: [
@@ -1042,39 +1257,58 @@ class MyAttendanceView extends StatelessWidget {
                         onPressed: () => Get.back(),
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
                         ),
-                        child: const Text('إلغاء', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textSecondary)),
+                        child: const Text('إلغاء',
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.textSecondary)),
                       ),
                     ),
                     SizedBox(width: 16),
                     Expanded(
                       flex: 2,
                       child: Obx(() {
-                        int currentTotal = isAbsent ? workDayMinutes : ((showLate.value ? initialLateMins : 0) + (showEarly.value ? initialEarlyExitMins : 0));
-                        bool hasEnoughCredit = selectedType.value != AppConstants.annualLeave || (totalCreditMinutes >= currentTotal);
-                        bool canSubmit = currentTotal > 0 && hasEnoughCredit;
+                        int currentTotal = isAbsent
+                            ? workDayMinutes
+                            : ((showLate.value ? initialLateMins : 0) +
+                                (showEarly.value ? initialEarlyExitMins : 0));
+                        bool hasEnoughCredit =
+                            selectedType.value != AppConstants.annualLeave ||
+                                (totalCreditMinutes >= currentTotal);
+                        bool canSubmit = currentTotal > 0 &&
+                            hasEnoughCredit &&
+                            (selectedType.value != AppConstants.otherVacation ||
+                                customType.value.trim().isNotEmpty);
 
                         return ElevatedButton(
                           onPressed: isLoading.value || !canSubmit
                               ? null
                               : () async {
                                   // Validate if day has both check-in and check-out
-                                  final targetAtt = controller.myAttendance.firstWhereOrNull((a) => a.date == att.date);
-                                  if (targetAtt != null && (targetAtt.checkIn ?? '').isNotEmpty && (targetAtt.checkOut ?? '').isNotEmpty && isAbsent) {
-                                    UiUtils.showErrorDialog('تنبيه', 'لا يمكنك طلب إجازة يوم كامل في يوم قمت بالبصمة فيه.');
+                                  final targetAtt = controller.myAttendance
+                                      .firstWhereOrNull(
+                                          (a) => a.date == att.date);
+                                  if (targetAtt != null &&
+                                      (targetAtt.checkIn ?? '').isNotEmpty &&
+                                      (targetAtt.checkOut ?? '').isNotEmpty &&
+                                      isAbsent) {
+                                    UiUtils.showErrorDialog('تنبيه',
+                                        'لا يمكنك طلب إجازة يوم كامل في يوم قمت بالبصمة فيه.');
                                     return;
                                   }
 
                                   String tag = "";
                                   if (!isAbsent) {
-                                      if (showLate.value && showEarly.value) {
-                                          tag = "[COVER_BOTH]";
-                                      } else if (showLate.value) {
-                                          tag = "[COVER_LATE]";
-                                      } else if (showEarly.value) {
-                                          tag = "[COVER_EARLY]";
-                                      }
+                                    if (showLate.value && showEarly.value) {
+                                      tag = "[COVER_BOTH]";
+                                    } else if (showLate.value) {
+                                      tag = "[COVER_LATE]";
+                                    } else if (showEarly.value) {
+                                      tag = "[COVER_EARLY]";
+                                    }
                                   }
 
                                   isLoading.value = true;
@@ -1082,32 +1316,47 @@ class MyAttendanceView extends StatelessWidget {
                                     att.date,
                                     att.date,
                                     isAbsent ? 1 : 0, // days
-                                    selectedType.value,
+                                    AppConstants.resolveVacationType(
+                                      selectedType.value,
+                                      customTypeController.text,
+                                    ),
                                     isHourly: !isAbsent,
                                     totalMinutes: currentTotal,
                                     startTime: '',
                                     endTime: '',
                                     reason: '${reasonController.text} $tag',
-                                    attachmentFile: selectedAttachmentFile.value,
+                                    attachmentFile:
+                                        selectedAttachmentFile.value,
                                   );
                                   isLoading.value = false;
                                   if (res == true) {
                                     Get.back();
-                                    UiUtils.showSuccessDialog('تم التغطية بنجاح', 'تم تقديم طلب الإجازة واحتساب الدقائق المطلوبة.');
+                                    UiUtils.showSuccessDialog(
+                                        'تم التغطية بنجاح',
+                                        'تم تقديم طلب الإجازة واحتساب الدقائق المطلوبة.');
                                   } else {
-                                    UiUtils.showErrorDialog('خطأ', res.toString());
+                                    UiUtils.showErrorDialog(
+                                        'خطأ', res.toString());
                                   }
                                 },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.primaryTeal,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
                             elevation: 0,
                           ),
                           child: isLoading.value
-                              ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                              : const Text('اعتماد التغطية', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2, color: Colors.white))
+                              : const Text('اعتماد التغطية',
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold)),
                         );
                       }),
                     ),
@@ -1134,7 +1383,8 @@ class MyAttendanceView extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
-        insetPadding: EdgeInsets.symmetric(horizontal: Responsive.isMobile(context) ? 16 : 32, vertical: 24),
+        insetPadding: EdgeInsets.symmetric(
+            horizontal: Responsive.isMobile(context) ? 16 : 32, vertical: 24),
         child: ConstrainedBox(
           constraints: BoxConstraints(
             maxWidth: Responsive.isDesktop(context) ? 450 : 400,
@@ -1148,8 +1398,10 @@ class MyAttendanceView extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: AppTheme.primaryTeal.withValues(alpha: 0.05),
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                  border: Border(bottom: BorderSide(color: AppTheme.borderLight)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(24)),
+                  border:
+                      Border(bottom: BorderSide(color: AppTheme.borderLight)),
                 ),
                 child: Row(
                   children: [
@@ -1158,24 +1410,39 @@ class MyAttendanceView extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
-                        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 10)
+                        ],
                       ),
-                      child: Icon(Icons.calendar_today_rounded, color: AppTheme.primaryTeal, size: 24),
+                      child: Icon(Icons.calendar_today_rounded,
+                          color: AppTheme.primaryTeal, size: 24),
                     ),
                     SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('تفاصيل يوم $dayName', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: AppTheme.textPrimary)),
-                          Text(att.date, style: TextStyle(color: AppTheme.textSecondary, fontSize: 12, fontWeight: FontWeight.bold)),
+                          Text('تفاصيل يوم $dayName',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 16,
+                                  color: AppTheme.textPrimary)),
+                          Text(att.date,
+                              style: TextStyle(
+                                  color: AppTheme.textSecondary,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ),
                     IconButton(
                       onPressed: () => Get.back(),
-                      icon: Icon(Icons.close_rounded, color: AppTheme.textSecondary),
-                      style: IconButton.styleFrom(backgroundColor: Colors.white),
+                      icon: Icon(Icons.close_rounded,
+                          color: AppTheme.textSecondary),
+                      style:
+                          IconButton.styleFrom(backgroundColor: Colors.white),
                     ),
                   ],
                 ),
@@ -1193,49 +1460,85 @@ class MyAttendanceView extends StatelessWidget {
                       const Divider(height: 24),
 
                       // Times Section
-                      if (att.status != 'absent' && att.status != 'pending') ...[
+                      if (att.status != 'absent' &&
+                          att.status != 'pending') ...[
                         Row(
                           children: [
-                            Expanded(child: _buildProTimeBox('وقت الدخول', _formatTime(att.checkIn), Icons.login_rounded, AppTheme.primaryTeal, isCorrected: att.isCheckInCorrected)),
+                            Expanded(
+                                child: _buildProTimeBox(
+                                    'وقت الدخول',
+                                    _formatTime(att.checkIn),
+                                    Icons.login_rounded,
+                                    AppTheme.primaryTeal,
+                                    isCorrected: att.isCheckInCorrected)),
                             SizedBox(width: 16),
-                            Expanded(child: _buildProTimeBox('وقت الخروج', _formatTime(att.checkOut), Icons.logout_rounded, AppTheme.primaryTeal, isCorrected: att.isCheckOutCorrected)),
+                            Expanded(
+                                child: _buildProTimeBox(
+                                    'وقت الخروج',
+                                    _formatTime(att.checkOut),
+                                    Icons.logout_rounded,
+                                    AppTheme.primaryTeal,
+                                    isCorrected: att.isCheckOutCorrected)),
                           ],
                         ),
                         SizedBox(height: 16),
                         if (att.lateMinutes > 0)
-                          _buildDetailRow('التأخير', '${att.lateMinutes} دقيقة', color: Colors.orange),
+                          _buildDetailRow('التأخير', '${att.lateMinutes} دقيقة',
+                              color: Colors.orange),
                         if (att.earlyExitMinutes > 0)
-                          _buildDetailRow('خروج مبكر', '${att.earlyExitMinutes} دقيقة', color: Colors.orange),
+                          _buildDetailRow(
+                              'خروج مبكر', '${att.earlyExitMinutes} دقيقة',
+                              color: Colors.orange),
                         const Divider(height: 24),
                       ],
 
                       // Financial Section
-                      const Text('التفاصيل المالية:', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14)),
+                      const Text('التفاصيل المالية:',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w900, fontSize: 14)),
                       SizedBox(height: 12),
                       if (att.lateDiscount > 0)
-                        _buildDetailRow('خصم التأخير', '${att.lateDiscount.toStringAsFixed(2)} ر.س', color: Colors.orange),
+                        _buildDetailRow('خصم التأخير',
+                            '${att.lateDiscount.toStringAsFixed(2)} ر.س',
+                            color: Colors.orange),
                       if (att.earlyExitDiscount > 0)
-                        _buildDetailRow('خصم الخروج مبكر', '${att.earlyExitDiscount.toStringAsFixed(2)} ر.س', color: Colors.orange),
-                      if (att.status == 'absent' && !controller.isDayApprovedVacation(att.date))
-                        _buildDetailRow('خصم الغياب', '${att.discount.toStringAsFixed(2)} ر.س', color: AppTheme.errorRed),
+                        _buildDetailRow('خصم الخروج مبكر',
+                            '${att.earlyExitDiscount.toStringAsFixed(2)} ر.س',
+                            color: Colors.orange),
+                      if (att.status == 'absent' &&
+                          !controller.isDayApprovedVacation(att.date))
+                        _buildDetailRow('خصم الغياب',
+                            '${att.discount.toStringAsFixed(2)} ر.س',
+                            color: AppTheme.errorRed),
 
-                      _buildDetailRow('إجمالي الخصم', '${att.discount.toStringAsFixed(2)} ر.س',
+                      _buildDetailRow('إجمالي الخصم',
+                          '${att.discount.toStringAsFixed(2)} ر.س',
                           isBold: true,
-                          color: att.discount > 0 ? AppTheme.errorRed : AppTheme.successGreen),
+                          color: att.discount > 0
+                              ? AppTheme.errorRed
+                              : AppTheme.successGreen),
 
                       if (approvedOvertime.isNotEmpty) ...[
                         const Divider(height: 24),
-                        const Text('تفاصيل العمل الإضافي:', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14)),
+                        const Text('تفاصيل العمل الإضافي:',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w900, fontSize: 14)),
                         SizedBox(height: 12),
                         ...approvedOvertime.map((req) {
-                          final amount = req.totalMinutes * ((controller.employeeData.value?.salary ?? 0.0) / controller.daysInMonth / 480);
+                          final amount = req.totalMinutes *
+                              ((controller.employeeData.value?.salary ?? 0.0) /
+                                  controller.daysInMonth /
+                                  480);
                           return Container(
                             margin: const EdgeInsets.only(bottom: 12),
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: AppTheme.primaryTeal.withValues(alpha: 0.04),
+                              color:
+                                  AppTheme.primaryTeal.withValues(alpha: 0.04),
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: AppTheme.primaryTeal.withValues(alpha: 0.08)),
+                              border: Border.all(
+                                  color: AppTheme.primaryTeal
+                                      .withValues(alpha: 0.08)),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1244,37 +1547,82 @@ class MyAttendanceView extends StatelessWidget {
                                   children: [
                                     Container(
                                       padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(color: AppTheme.primaryTeal.withValues(alpha: 0.1), shape: BoxShape.circle),
-                                      child: Icon(Icons.more_time_rounded, size: 18, color: AppTheme.primaryTeal),
+                                      decoration: BoxDecoration(
+                                          color: AppTheme.primaryTeal
+                                              .withValues(alpha: 0.1),
+                                          shape: BoxShape.circle),
+                                      child: Icon(Icons.more_time_rounded,
+                                          size: 18,
+                                          color: AppTheme.primaryTeal),
                                     ),
                                     SizedBox(width: 12),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          const Text('فترة العمل الإضافي', style: TextStyle(fontSize: 11, color: AppTheme.textSecondary, fontWeight: FontWeight.bold)),
-                                          Text('${_formatTime(req.startTime)} - ${_formatTime(req.endTime)}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AppTheme.textPrimary)),
+                                          const Text('فترة العمل الإضافي',
+                                              style: TextStyle(
+                                                  fontSize: 11,
+                                                  color: AppTheme.textSecondary,
+                                                  fontWeight: FontWeight.bold)),
+                                          Text(
+                                              '${_formatTime(req.startTime)} - ${_formatTime(req.endTime)}',
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w900,
+                                                  color: AppTheme.textPrimary)),
                                         ],
                                       ),
                                     ),
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                      decoration: BoxDecoration(color: AppTheme.successGreen.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
-                                      child: Text('+ ${amount.toStringAsFixed(2)} ر.س', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppTheme.successGreen)),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 6),
+                                      decoration: BoxDecoration(
+                                          color: AppTheme.successGreen
+                                              .withValues(alpha: 0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      child: Text(
+                                          '+ ${amount.toStringAsFixed(2)} ر.س',
+                                          style: TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w900,
+                                              color: AppTheme.successGreen)),
                                     ),
                                   ],
                                 ),
-                                if (req.reason != null && req.reason!.isNotEmpty) ...[
+                                if (req.reason != null &&
+                                    req.reason!.isNotEmpty) ...[
                                   SizedBox(height: 12),
                                   Container(
                                     width: double.infinity,
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                    decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(10)),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 8),
+                                    decoration: BoxDecoration(
+                                        color:
+                                            Colors.white.withValues(alpha: 0.5),
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
                                     child: Row(
                                       children: [
-                                        Icon(Icons.info_outline_rounded, size: 14, color: AppTheme.textSecondary),
+                                        Icon(Icons.info_outline_rounded,
+                                            size: 14,
+                                            color: AppTheme.textSecondary),
                                         SizedBox(width: 8),
-                                        Expanded(child: Text(req.reason!.replaceAll(RegExp(r'\[COVER_(LATE|EARLY|BOTH)\]'), '').trim(), style: TextStyle(fontSize: 12, color: AppTheme.textSecondary, height: 1.3))),
+                                        Expanded(
+                                            child: Text(
+                                                req.reason!
+                                                    .replaceAll(
+                                                        RegExp(
+                                                            r'\[COVER_(LATE|EARLY|BOTH)\]'),
+                                                        '')
+                                                    .trim(),
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color:
+                                                        AppTheme.textSecondary,
+                                                    height: 1.3))),
                                       ],
                                     ),
                                   ),
@@ -1283,9 +1631,18 @@ class MyAttendanceView extends StatelessWidget {
                                 Row(
                                   children: [
                                     const Spacer(),
-                                    Icon(Icons.timer_outlined, size: 14, color: AppTheme.primaryTeal.withValues(alpha: 0.6)),
+                                    Icon(Icons.timer_outlined,
+                                        size: 14,
+                                        color: AppTheme.primaryTeal
+                                            .withValues(alpha: 0.6)),
                                     SizedBox(width: 4),
-                                    Text('المدة: ${UiUtils.formatDuration(req.totalMinutes)}', style: TextStyle(fontSize: 11, color: AppTheme.primaryTeal.withValues(alpha: 0.8), fontWeight: FontWeight.bold)),
+                                    Text(
+                                        'المدة: ${UiUtils.formatDuration(req.totalMinutes)}',
+                                        style: TextStyle(
+                                            fontSize: 11,
+                                            color: AppTheme.primaryTeal
+                                                .withValues(alpha: 0.8),
+                                            fontWeight: FontWeight.bold)),
                                   ],
                                 ),
                               ],
@@ -1297,48 +1654,79 @@ class MyAttendanceView extends StatelessWidget {
                       // Notes Section
                       if (att.notes != null && att.notes!.isNotEmpty) ...[
                         const Divider(height: 24),
-                        const Text('ملاحظات:', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14)),
+                        const Text('ملاحظات:',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w900, fontSize: 14)),
                         SizedBox(height: 8),
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(color: AppTheme.backgroundLight, borderRadius: BorderRadius.circular(12)),
-                          child: Text(att.notes!, style: TextStyle(fontSize: 13, height: 1.4)),
+                          decoration: BoxDecoration(
+                              color: AppTheme.backgroundLight,
+                              borderRadius: BorderRadius.circular(12)),
+                          child: Text(att.notes!,
+                              style: TextStyle(fontSize: 13, height: 1.4)),
                         ),
                       ],
 
                       // Correction Details
                       Builder(builder: (context) {
-                        final approvedCorrections = controller.myCorrectionRequests.where((c) => c.date == att.date && c.status == 'approved').toList();
-                        if (approvedCorrections.isEmpty) return const SizedBox.shrink();
+                        final approvedCorrections = controller
+                            .myCorrectionRequests
+                            .where((c) =>
+                                c.date == att.date && c.status == 'approved')
+                            .toList();
+                        if (approvedCorrections.isEmpty)
+                          return const SizedBox.shrink();
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Divider(height: 24),
-                            const Text('تصحيحات البصمة المعتمدة:', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14)),
+                            const Text('تصحيحات البصمة المعتمدة:',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w900, fontSize: 14)),
                             SizedBox(height: 12),
                             ...approvedCorrections.map((c) {
-                              String typeText = c.type == 'check_in' || c.type == 'missing_check_in' ? 'بصمة دخول' : 'بصمة خروج';
+                              String typeText = c.type == 'check_in' ||
+                                      c.type == 'missing_check_in'
+                                  ? 'بصمة دخول'
+                                  : 'بصمة خروج';
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 8),
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: Colors.purple.withValues(alpha: 0.05),
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: Colors.purple.withValues(alpha: 0.1)),
+                                  border: Border.all(
+                                      color:
+                                          Colors.purple.withValues(alpha: 0.1)),
                                 ),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Text(typeText, style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.purple)),
+                                        Text(typeText,
+                                            style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.purple)),
                                         if (c.reason.isNotEmpty)
-                                          Text('السبب: ${c.reason}', style: TextStyle(fontSize: 11, color: AppTheme.textSecondary)),
+                                          Text('السبب: ${c.reason}',
+                                              style: TextStyle(
+                                                  fontSize: 11,
+                                                  color:
+                                                      AppTheme.textSecondary)),
                                       ],
                                     ),
-                                    Text(_formatTime(c.requestedTime), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.purple)),
+                                    Text(_formatTime(c.requestedTime),
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w900,
+                                            color: Colors.purple)),
                                   ],
                                 ),
                               );
@@ -1355,13 +1743,21 @@ class MyAttendanceView extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Colors.orange.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.orange.withValues(alpha: 0.2)),
+                            border: Border.all(
+                                color: Colors.orange.withValues(alpha: 0.2)),
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.hourglass_empty_rounded, size: 16, color: Colors.orange),
+                              Icon(Icons.hourglass_empty_rounded,
+                                  size: 16, color: Colors.orange),
                               SizedBox(width: 8),
-                              Expanded(child: Text('يوجد طلب تصحيح قيد الانتظار لهذا اليوم', style: TextStyle(fontSize: 12, color: Colors.orange, fontWeight: FontWeight.bold))),
+                              Expanded(
+                                  child: Text(
+                                      'يوجد طلب تصحيح قيد الانتظار لهذا اليوم',
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.orange,
+                                          fontWeight: FontWeight.bold))),
                             ],
                           ),
                         ),
@@ -1377,7 +1773,8 @@ class MyAttendanceView extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppTheme.backgroundLight,
                   border: Border(top: BorderSide(color: AppTheme.borderLight)),
-                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
+                  borderRadius:
+                      const BorderRadius.vertical(bottom: Radius.circular(24)),
                 ),
                 child: Row(
                   children: [
@@ -1386,32 +1783,43 @@ class MyAttendanceView extends StatelessWidget {
                         onPressed: () => Get.back(),
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
                         ),
-                        child: const Text('إغلاق', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textSecondary)),
+                        child: const Text('إغلاق',
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.textSecondary)),
                       ),
                     ),
                     if (att.status == 'absent' &&
                         !att.isPendingCorrection &&
                         !controller.isDayApprovedVacation(att.date) &&
-                        (att.checkIn == null || att.checkIn!.isEmpty || att.checkOut == null || att.checkOut!.isEmpty)) ...[
+                        (att.checkIn == null ||
+                            att.checkIn!.isEmpty ||
+                            att.checkOut == null ||
+                            att.checkOut!.isEmpty)) ...[
                       SizedBox(width: 16),
                       Expanded(
                         flex: 2,
                         child: ElevatedButton.icon(
                           onPressed: () {
                             Get.back();
-                            _showCoverWithVacationDialog(context, att, isAbsent: true);
+                            _showCoverWithVacationDialog(context, att,
+                                isAbsent: true);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.primaryTeal,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
                             elevation: 0,
                           ),
                           icon: Icon(Icons.beach_access_rounded, size: 18),
-                          label: const Text('طلب إجازة', style: TextStyle(fontWeight: FontWeight.bold)),
+                          label: const Text('طلب إجازة',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ),
                     ],
@@ -1429,11 +1837,13 @@ class MyAttendanceView extends StatelessWidget {
                             backgroundColor: AppTheme.successGreen,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
                             elevation: 0,
                           ),
                           icon: Icon(Icons.beach_access_rounded, size: 18),
-                          label: const Text('تغطية بإجازة', style: TextStyle(fontWeight: FontWeight.bold)),
+                          label: const Text('تغطية بإجازة',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ),
                     ],
@@ -1446,6 +1856,7 @@ class MyAttendanceView extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildDetailRow(String label, String value,
       {bool isBold = false, Color? color, bool isCorrected = false}) {
     return Padding(
@@ -1454,8 +1865,7 @@ class MyAttendanceView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label,
-              style:
-                  TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
+              style: TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [

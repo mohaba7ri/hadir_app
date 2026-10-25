@@ -9,10 +9,14 @@ class AppConstants {
   static const String officialHoliday = 'إجازة رسمية';
   static const String marriage = 'زواج';
   static const String bereavement = 'وفاة';
+  static const String otherVacation = 'أخرى';
+
+  static String resolveVacationType(String selectedType, String customType) =>
+      selectedType == otherVacation ? customType.trim() : selectedType;
 
   static List<String> getVacationTypes() {
     final authController = Get.find<AuthController>();
-    
+
     final allTypes = [
       annualLeave,
       businessMission,
@@ -21,10 +25,11 @@ class AppConstants {
       bereavement,
       exemption,
       officialHoliday,
+      otherVacation,
     ];
 
-    // Only show 'إعفاء' if user is super_admin
-    if (!authController.isSuperAdmin.value) {
+    // Exemption requests are available to admin roles only.
+    if (!authController.isAdmin.value && !authController.isSuperAdmin.value) {
       allTypes.remove(exemption);
     }
 

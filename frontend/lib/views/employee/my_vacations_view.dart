@@ -153,21 +153,24 @@ class MyVacationsView extends StatelessWidget {
                             IconButton(
                               onPressed: () {
                                 UiUtils.showConfirmDialog(
-                                  title: 'تأكيد الحذف',
-                                  message: 'هل أنت متأكد من حذف هذه الإجازة؟',
-                                  confirmColor: AppTheme.errorRed,
-                                  confirmText: 'حذف',
-                                  onConfirm: () async {
-                                    final res = await controller.deleteVacation(req.id!);
-                                    if (res == null) {
-                                      UiUtils.showSuccessDialog('تم الحذف', 'تم حذف الإجازة بنجاح.');
-                                    } else {
-                                      UiUtils.showErrorDialog('تعذر الحذف', res);
-                                    }
-                                  }
-                                );
+                                    title: 'تأكيد الحذف',
+                                    message: 'هل أنت متأكد من حذف هذه الإجازة؟',
+                                    confirmColor: AppTheme.errorRed,
+                                    confirmText: 'حذف',
+                                    onConfirm: () async {
+                                      final res = await controller
+                                          .deleteVacation(req.id!);
+                                      if (res == null) {
+                                        UiUtils.showSuccessDialog('تم الحذف',
+                                            'تم حذف الإجازة بنجاح.');
+                                      } else {
+                                        UiUtils.showErrorDialog(
+                                            'تعذر الحذف', res);
+                                      }
+                                    });
                               },
-                              icon: Icon(Icons.delete_outline_rounded, size: 20, color: AppTheme.errorRed),
+                              icon: Icon(Icons.delete_outline_rounded,
+                                  size: 20, color: AppTheme.errorRed),
                               tooltip: 'حذف الإجازة',
                               padding: EdgeInsets.zero,
                               constraints: BoxConstraints(),
@@ -228,6 +231,8 @@ class MyVacationsView extends StatelessWidget {
     final timeStartController = TextEditingController();
     final timeEndController = TextEditingController();
     final reasonController = TextEditingController();
+    final customTypeController = TextEditingController();
+    final RxString customType = ''.obs;
 
     final RxString selectedType = AppConstants.annualLeave.obs;
     final RxBool isHourly = false.obs;
@@ -267,19 +272,23 @@ class MyVacationsView extends StatelessWidget {
       int baselineMonth = 8;
       DateTime baselineCycleStart = DateTime(2026, 7, 25);
 
-      if (reqYear < baselineYear || (reqYear == baselineYear && reqMonth < baselineMonth)) {
+      if (reqYear < baselineYear ||
+          (reqYear == baselineYear && reqMonth < baselineMonth)) {
         int startMonth = reqMonth == 1 ? 12 : reqMonth - 1;
         int startYear = reqMonth == 1 ? reqYear - 1 : reqYear;
         DateTime cycleStart = DateTime(startYear, startMonth, 25);
         DateTime cycleEnd = DateTime(reqYear, reqMonth, 24, 23, 59, 59);
 
-        final int usedMinutesThisMonth = controller.myVacationRequests.where((v) {
+        final int usedMinutesThisMonth =
+            controller.myVacationRequests.where((v) {
           if (v.vacationType != AppConstants.annualLeave) return false;
           if (v.status != 'pending' && v.status != 'approved') return false;
           try {
             final reqStart = DateTime.parse(v.startDate);
-            return (reqStart.isAfter(cycleStart) || reqStart.isAtSameMomentAs(cycleStart)) && 
-                   (reqStart.isBefore(cycleEnd) || reqStart.isAtSameMomentAs(cycleEnd));
+            return (reqStart.isAfter(cycleStart) ||
+                    reqStart.isAtSameMomentAs(cycleStart)) &&
+                (reqStart.isBefore(cycleEnd) ||
+                    reqStart.isAtSameMomentAs(cycleEnd));
           } catch (_) {
             return false;
           }
@@ -308,8 +317,9 @@ class MyVacationsView extends StatelessWidget {
             if (v.status != 'pending' && v.status != 'approved') return false;
             try {
               final reqStart = DateTime.parse(v.startDate);
-              return (reqStart.isAfter(cStart) || reqStart.isAtSameMomentAs(cStart)) &&
-                     (reqStart.isBefore(cEnd) || reqStart.isAtSameMomentAs(cEnd));
+              return (reqStart.isAfter(cStart) ||
+                      reqStart.isAtSameMomentAs(cStart)) &&
+                  (reqStart.isBefore(cEnd) || reqStart.isAtSameMomentAs(cEnd));
             } catch (_) {
               return false;
             }
@@ -404,6 +414,22 @@ class MyVacationsView extends StatelessWidget {
                         calculateTotal();
                       },
                     )),
+                Obx(() => selectedType.value == AppConstants.otherVacation
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: TextField(
+                          controller: customTypeController,
+                          maxLength: 100,
+                          autofocus: true,
+                          decoration: const InputDecoration(
+                            labelText: 'نوع الإجازة',
+                            hintText: 'اكتب نوع الإجازة',
+                            prefixIcon: Icon(Icons.edit_outlined),
+                          ),
+                          onChanged: (value) => customType.value = value,
+                        ),
+                      )
+                    : const SizedBox.shrink()),
                 SizedBox(height: 12),
                 Obx(() => SwitchListTile(
                       title: const Text('إجازة (جزئية)',
@@ -534,10 +560,12 @@ class MyVacationsView extends StatelessWidget {
                                       fontSize: 12,
                                       color: AppTheme.textSecondary)),
                               Obx(() {
-                                final reqMonth = DateTime.tryParse(startController.text) ?? DateTime.now();
-                                final rem = getMonthlyRemainingBalance(reqMonth);
-                                return Text(
-                                    UiUtils.formatDuration(rem),
+                                final reqMonth =
+                                    DateTime.tryParse(startController.text) ??
+                                        DateTime.now();
+                                final rem =
+                                    getMonthlyRemainingBalance(reqMonth);
+                                return Text(UiUtils.formatDuration(rem),
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 13));
@@ -724,7 +752,10 @@ class MyVacationsView extends StatelessWidget {
                                 (selectedType.value !=
                                         AppConstants.annualLeave &&
                                     controller.selectedAttachmentFile.value ==
-                                        null)
+                                        null) ||
+                                (selectedType.value ==
+                                        AppConstants.otherVacation &&
+                                    customType.value.trim().isEmpty)
                             ? null
                             : () async {
                                 // Validate if any day in range has both check-in and check-out
@@ -764,7 +795,10 @@ class MyVacationsView extends StatelessWidget {
                                       ? startController.text
                                       : endController.text,
                                   calculatedDays.value,
-                                  selectedType.value,
+                                  AppConstants.resolveVacationType(
+                                    selectedType.value,
+                                    customTypeController.text,
+                                  ),
                                   attachmentFile:
                                       controller.selectedAttachmentFile.value,
                                   isHourly: isHourly.value,
