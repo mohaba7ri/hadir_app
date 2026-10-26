@@ -28,8 +28,8 @@ class AppConstants {
       otherVacation,
     ];
 
-    // Exemption requests are available to admin roles only.
-    if (!authController.isAdmin.value && !authController.isSuperAdmin.value) {
+    // Exemption requests are available to super admins only.
+    if (!authController.isSuperAdmin.value) {
       allTypes.remove(exemption);
     }
 
